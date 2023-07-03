@@ -1,0 +1,34 @@
+{
+  "name": "ai-ghost-writer",
+  "version": "0.0.0",
+  "author": "silverbirder",
+  "description": "",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "chrome-extension",
+    "lit",
+    "lit-element",
+    "vite",
+    "create-chrome-ext"
+  ],
+  "engines": {
+    "node": ">=14.18.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "fmt": "prettier --write '**/*.{ts,json,css,scss,md}'"
+  },
+  "dependencies": {
+    "lit": "^2.2.6"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^1.0.12",
+    "@types/chrome": "^0.0.236",
+    "path": "^0.12.7",
+    "prettier": "^2.7.1",
+    "typescript": "^4.6.4",
+    "vite": "^2.9.13"
+  }
+}
