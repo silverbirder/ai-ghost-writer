@@ -1,18 +1,42 @@
 import { html, css, LitElement } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { customElement, property, state } from 'lit/decorators.js'
 
 /**
- * newtab
+ * sidepanel
  */
-@customElement('crx-newtab')
-export class Newtab extends LitElement {
+@customElement('crx-sidepanel')
+export class Sidepanel extends LitElement {
   @property()
   crx = 'create-chrome-ext'
+
+  @state()
+  texts: string[] = ['hello']
+
+  _onMessage = ({ name, data }: { name: string; data: any }) => {
+    if (name === 'proofreading') {
+      console.log('proofreading', { data })
+      if (data.choices[0].delta.finish_reason === 'stop') {
+        return
+      }
+      this.texts.push(data.choices[0].delta.content)
+      this.requestUpdate()
+    }
+  }
+
+  connectedCallback() {
+    super.connectedCallback()
+    chrome.runtime.onMessage.addListener(this._onMessage)
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    chrome.runtime.onMessage.removeListener(this._onMessage)
+  }
 
   render() {
     return html`
       <main>
-        <h3>Newtab Page!</h3>
+        <h3>Sidepanel Page!</h3>
 
         <h6>v 0.0.0</h6>
 
@@ -21,6 +45,7 @@ export class Newtab extends LitElement {
         <a href="https://www.npmjs.com/package/create-chrome-ext" target="_blank"
           >Generator by ${this.crx}</a
         >
+        <div>${this.texts.join('')}</div>
       </main>
     `
   }
@@ -73,6 +98,6 @@ export class Newtab extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'crx-newtab': Newtab
+    'crx-sidepanel': Sidepanel
   }
 }
