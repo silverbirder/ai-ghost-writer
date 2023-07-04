@@ -1,5 +1,10 @@
+@font-face {
+  font-family: 'Gudea Regular';
+  src: url('/fonts/Gudea Regular.ttf');
+}
+
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Gudea Regular;
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
