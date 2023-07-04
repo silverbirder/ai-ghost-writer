@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js'
 /**
  * newtab
  */
-@customElement('newtab')
+@customElement('crx-newtab')
 export class Newtab extends LitElement {
   @property()
   crx = 'create-chrome-ext'
@@ -73,6 +73,6 @@ export class Newtab extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    newtab: Newtab
+    'crx-newtab': Newtab
   }
 }
