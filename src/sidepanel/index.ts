@@ -9,6 +9,20 @@ export class Sidepanel extends LitElement {
   @property()
   crx = 'create-chrome-ext'
 
+  _onMessage = ({ name }: { name: string }) => {
+    console.log('from sidepanel', { name })
+  }
+
+  connectedCallback() {
+    super.connectedCallback()
+    chrome.runtime.onMessage.addListener(this._onMessage)
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    chrome.runtime.onMessage.removeListener(this._onMessage)
+  }
+
   render() {
     return html`
       <main>

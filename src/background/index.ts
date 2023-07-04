@@ -6,9 +6,11 @@ chrome.runtime.onInstalled.addListener(async () => {
     title: `文章校正 "%s"`,
     contexts: ['selection', 'editable'],
   })
-
-  chrome.contextMenus.onClicked.addListener((info) => {
-    console.log({ info })
+  chrome.contextMenus.onClicked.addListener(async (info) => {
+    chrome.runtime.sendMessage({
+      name: 'from-background',
+      data: { value: info },
+    })
   })
 })
 
