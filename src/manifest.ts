@@ -27,6 +27,10 @@ export default defineManifest({
       js: ['src/content/index.ts'],
     },
   ],
+  //@ts-ignore
+  side_panel: {
+    default_path: 'sidepanel.html',
+  },
   web_accessible_resources: [
     {
       resources: ['img/logo-16.png', 'img/logo-34.png', 'img/logo-48.png', 'img/logo-128.png'],
@@ -36,5 +40,5 @@ export default defineManifest({
   chrome_url_overrides: {
     newtab: 'newtab.html',
   },
-  permissions: ['contextMenus', 'storage'],
+  permissions: ['contextMenus', 'storage', 'sidePanel'],
 })
