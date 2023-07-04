@@ -1,8 +1,9 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 
 export default defineManifest({
-  name: 'create-chrome-ext',
-  description: '',
+  name: 'ai-ghost-writer',
+  description:
+    'AI Ghostwriter is a Chrome extension that provides real-time AI assistance for your writing, offering a smoother and more effective writing experience.',
   version: '0.0.0',
   manifest_version: 3,
   icons: {
@@ -33,7 +34,7 @@ export default defineManifest({
     },
   ],
   chrome_url_overrides: {
-    newtab: "newtab.html",
+    newtab: 'newtab.html',
   },
-  permissions: [],
+  permissions: ['contextMenus', 'storage'],
 })
