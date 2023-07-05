@@ -1,6 +1,10 @@
 console.info('chrome-ext template-lit-ts background script')
 import { Configuration, OpenAIApi } from 'openai-edge'
 
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error))
+
 chrome.runtime.onInstalled.addListener(async () => {
   console.info('chrome.runtime.onInstalled')
   chrome.contextMenus.create({
