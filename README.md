@@ -1,5 +1,8 @@
 # ai-ghost-writer
 
+![logo-color-resize](https://github.com/silverbirder/ai-ghost-writer/assets/10257868/c8533d99-ccac-40ed-9cf1-bca5186a013b)
+
+
 > a chrome extension tools built with Vite + Lit, and Manifest v3
 
 ## Installing
