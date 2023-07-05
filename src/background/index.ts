@@ -8,47 +8,48 @@ chrome.runtime.onInstalled.addListener(async () => {
     title: `文章校正 "%s"`,
     contexts: ['selection', 'editable'],
   })
+})
+
+chrome.contextMenus.onClicked.addListener(async (info) => {
   const { apiToken: apiKey } = await chrome.storage.sync.get('apiToken')
   const configuration = new Configuration({
     apiKey,
   })
   const openai = new OpenAIApi(configuration)
-  chrome.contextMenus.onClicked.addListener(async (info) => {
-    console.info('chrome.contextMenus.onClicked')
-    if (info.menuItemId === 'proofreading') {
-      console.info('chrome.contextMenus.onClicked menuItemId proofreading')
-      console.info('chrome.runtime.sendMessage proofreading-start')
-      chrome.runtime.sendMessage({
-        name: 'proofreading-start',
-      })
-      console.info('before openai api call')
-      const completion = await openai.createChatCompletion({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You are a professional ghostwriter.' +
-              'The data sent by the user is a blog manuscript.' +
-              'Clean up and output the manuscript.' +
-              'Output format is Markdown.' +
-              'Output language is Japanese.',
-          },
-          { role: 'user', content: info.selectionText },
-        ],
-        temperature: 0,
-        stream: true,
-      })
-      console.info('after openai api call')
-      if (!completion.body) return
-      if (completion.status !== 200) {
-        throw new Error('Request failed')
-      }
-      const reader: ReadableStreamReader<Uint8Array> = completion.body?.getReader()
-      const decoder: TextDecoder = new TextDecoder('utf-8')
-      processStream(reader, decoder).catch((err: any) => console.error(err))
+  console.info('chrome.contextMenus.onClicked')
+  if (info.menuItemId === 'proofreading') {
+    console.info('chrome.contextMenus.onClicked menuItemId proofreading')
+    console.info('chrome.runtime.sendMessage proofreading-start')
+    chrome.runtime.sendMessage({
+      name: 'proofreading-start',
+    })
+    console.info('before openai api call')
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a professional ghostwriter.' +
+            'The data sent by the user is a blog manuscript.' +
+            'Clean up and output the manuscript.' +
+            'Output format is Markdown.' +
+            'Output language is Japanese.',
+        },
+        { role: 'user', content: info.selectionText },
+      ],
+      temperature: 0,
+      stream: true,
+    })
+    console.info('after openai api call')
+    if (!completion.body) return
+    if (completion.status !== 200) {
+      throw new Error('Request failed')
     }
-  })
+    const reader: ReadableStreamReader<Uint8Array> = completion.body?.getReader()
+    const decoder: TextDecoder = new TextDecoder('utf-8')
+    processStream(reader, decoder).catch((err: any) => console.error(err))
+  }
 })
 
 async function processStream(
