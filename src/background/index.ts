@@ -5,7 +5,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   console.info('chrome.runtime.onInstalled')
   chrome.contextMenus.create({
     id: 'proofreading',
-    title: `文章校正 "%s"`,
+    title: `Proofreading "%s"`,
     contexts: ['selection', 'editable'],
   })
 })
@@ -22,6 +22,7 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     console.info('chrome.runtime.sendMessage proofreading-start')
     chrome.runtime.sendMessage({
       name: 'proofreading-start',
+      selectionText: info.selectionText,
     })
     console.info('before openai api call')
     const completion = await openai.createChatCompletion({
@@ -34,7 +35,8 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
             'The data sent by the user is a blog manuscript.' +
             'Clean up and output the manuscript.' +
             'Output format is Markdown.' +
-            'Output language is Japanese.',
+            'Output language is Japanese.' +
+            'Write the Output as concisely as possible.',
         },
         { role: 'user', content: info.selectionText },
       ],
@@ -48,13 +50,14 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     }
     const reader: ReadableStreamReader<Uint8Array> = completion.body?.getReader()
     const decoder: TextDecoder = new TextDecoder('utf-8')
-    processStream(reader, decoder).catch((err: any) => console.error(err))
+    processStream(reader, decoder, info.selectionText || '').catch((err: any) => console.error(err))
   }
 })
 
 async function processStream(
   reader: ReadableStreamReader<Uint8Array>,
   decoder: TextDecoder,
+  selectionText: string,
 ): Promise<void> {
   while (true) {
     // @ts-ignore
@@ -74,12 +77,14 @@ async function processStream(
           console.info('chrome.runtime.sendMessage proofreading-end')
           chrome.runtime.sendMessage({
             name: 'proofreading-end',
+            selectionText,
           })
         } else {
           console.info('chrome.runtime.sendMessage proofreading-inprogress')
           chrome.runtime.sendMessage({
             name: 'proofreading-inprogress',
             data: json,
+            selectionText,
           })
         }
       } catch (error) {}

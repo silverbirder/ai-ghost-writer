@@ -1,25 +1,30 @@
 import { html, css, LitElement } from 'lit'
-import { customElement, property, state } from 'lit/decorators.js'
+import { customElement, state } from 'lit/decorators.js'
 
 /**
  * sidepanel
  */
 @customElement('crx-sidepanel')
 export class Sidepanel extends LitElement {
-  @property()
-  crx = 'create-chrome-ext'
-
   @state()
-  texts: string[] = ['']
+  chats: { selectionText: string; comments: string[] }[] = []
 
-  _onMessage = ({ name, data }: { name: string; data: any }) => {
-    console.info('_onMessage', { name, data })
+  _onMessage = ({
+    name,
+    data,
+    selectionText,
+  }: {
+    name: string
+    data: any
+    selectionText: string
+  }) => {
+    console.info('_onMessage', { name, data, selectionText })
     switch (name) {
       case 'proofreading-start':
-        this.texts = []
+        this.chats.push({ selectionText, comments: [] })
         break
       case 'proofreading-inprogress':
-        this.texts.push(data.choices[0].delta.content)
+        this.chats[this.chats.length - 1].comments.push(data.choices[0].delta.content)
         break
       case 'proofreading-end':
         break
@@ -43,7 +48,14 @@ export class Sidepanel extends LitElement {
     return html`
       <main>
         <h3>Comments from AI ghost writer</h3>
-        <div>${this.texts.join('')}</div>
+        <div>
+          ${this.chats.map(({ comments, selectionText }) => {
+            return html`<div>
+              <h4>Selection Text: ${selectionText}</h4>
+              <div>${comments.join('')}</div>
+            </div>`
+          })}
+        </div>
       </main>
     `
   }
@@ -54,7 +66,6 @@ export class Sidepanel extends LitElement {
     }
 
     main {
-      text-align: center;
       padding: 1em;
       margin: 0 auto;
     }
