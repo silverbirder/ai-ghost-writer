@@ -52,7 +52,7 @@ export class Sidepanel extends LitElement {
           ${this.chats.map(({ comments, selectionText }) => {
             return html`<div>
               <h4>Selection Text: ${selectionText}</h4>
-              <div>${comments.join('')}</div>
+              <div><img src="/img/logo-34.png" />${comments.join('')}</div>
             </div>`
           })}
         </div>
