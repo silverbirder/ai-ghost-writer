@@ -9,28 +9,28 @@ export class Options extends LitElement {
   @property()
   crx = 'create-chrome-ext'
 
+  private _onSubmit(event: Event) {
+    event.preventDefault()
+    const apiToken = (this.shadowRoot!.getElementById('apiToken') as HTMLInputElement).value
+    chrome.storage.sync.set({ apiToken }, () => {
+      console.log('API Token is stored in Chrome storage.')
+    })
+  }
+
   render() {
     return html`
       <main>
-        <h3>Options Page!</h3>
-
-        <h6>v 0.0.0</h6>
-
-        <slot></slot>
-
-        <a href="https://www.npmjs.com/package/create-chrome-ext" target="_blank"
-          >Generator by ${this.crx}</a
-        >
+        <h1>OpenAI API Token Settings</h1>
+        <form id="apiTokenForm" @submit="${this._onSubmit}">
+          <label for="apiToken">API Token:</label>
+          <input type="text" id="apiToken" placeholder="sk-" />
+          <input type="submit" value="Save" />
+        </form>
       </main>
     `
   }
 
   static styles = css`
-    :root {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-        'Open Sans', 'Helvetica Neue', sans-serif;
-    }
-
     :global(body) {
       min-width: 20rem;
     }
@@ -41,26 +41,8 @@ export class Options extends LitElement {
       margin: 0 auto;
     }
 
-    h3 {
-      color: #3355ff;
-      text-transform: uppercase;
-      font-size: 1.5rem;
-      font-weight: 200;
-      line-height: 1.2rem;
-      margin: 2rem auto;
-    }
-
-    h6 {
-      font-size: 0.5rem;
-      color: #333333;
-      margin: 0.5rem;
-    }
-
-    a {
-      font-size: 0.5rem;
-      margin: 0.5rem;
-      color: #cccccc;
-      text-decoration: none;
+    h1 {
+      color: #31c48d;
     }
 
     @media (min-width: 480px) {
