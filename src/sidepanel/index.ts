@@ -13,6 +13,7 @@ export class Sidepanel extends LitElement {
   texts: string[] = ['']
 
   _onMessage = ({ name, data }: { name: string; data: any }) => {
+    console.info('_onMessage', { name, data })
     switch (name) {
       case 'proofreading-start':
         this.texts = []
@@ -28,11 +29,13 @@ export class Sidepanel extends LitElement {
 
   connectedCallback() {
     super.connectedCallback()
+    console.info('connectedCallback')
     chrome.runtime.onMessage.addListener(this._onMessage)
   }
 
   disconnectedCallback() {
     super.disconnectedCallback()
+    console.info('disconnectedCallback')
     chrome.runtime.onMessage.removeListener(this._onMessage)
   }
 
@@ -57,7 +60,7 @@ export class Sidepanel extends LitElement {
     }
 
     h3 {
-      color: #31C48D;
+      color: #31c48d;
     }
 
     @media (min-width: 480px) {

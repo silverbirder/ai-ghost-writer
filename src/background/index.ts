@@ -2,6 +2,7 @@ console.info('chrome-ext template-lit-ts background script')
 import { Configuration, OpenAIApi } from 'openai-edge'
 
 chrome.runtime.onInstalled.addListener(async () => {
+  console.info('chrome.runtime.onInstalled')
   chrome.contextMenus.create({
     id: 'proofreading',
     title: `文章校正 "%s"`,
@@ -13,10 +14,14 @@ chrome.runtime.onInstalled.addListener(async () => {
   })
   const openai = new OpenAIApi(configuration)
   chrome.contextMenus.onClicked.addListener(async (info) => {
+    console.info('chrome.contextMenus.onClicked')
     if (info.menuItemId === 'proofreading') {
+      console.info('chrome.contextMenus.onClicked menuItemId proofreading')
+      console.info('chrome.runtime.sendMessage proofreading-start')
       chrome.runtime.sendMessage({
         name: 'proofreading-start',
       })
+      console.info('before openai api call')
       const completion = await openai.createChatCompletion({
         model: 'gpt-4',
         messages: [
@@ -25,14 +30,16 @@ chrome.runtime.onInstalled.addListener(async () => {
             content:
               'You are a professional ghostwriter.' +
               'The data sent by the user is a blog manuscript.' +
-              'Please clean up the manuscript and output the cleaned up manuscript.' +
-              'The format is Markdown.',
+              'Clean up and output the manuscript.' +
+              'Output format is Markdown.' +
+              'Output language is Japanese.',
           },
           { role: 'user', content: info.selectionText },
         ],
         temperature: 0,
         stream: true,
       })
+      console.info('after openai api call')
       if (!completion.body) return
       if (completion.status !== 200) {
         throw new Error('Request failed')
@@ -61,11 +68,14 @@ async function processStream(
     if (splitText.length > 1) {
       try {
         const json = JSON.parse(splitText[1])
+        console.log('api json is', { json })
         if (json.choices[0].delta.finish_reason === 'stop') {
+          console.info('chrome.runtime.sendMessage proofreading-end')
           chrome.runtime.sendMessage({
             name: 'proofreading-end',
           })
         } else {
+          console.info('chrome.runtime.sendMessage proofreading-inprogress')
           chrome.runtime.sendMessage({
             name: 'proofreading-inprogress',
             data: json,
