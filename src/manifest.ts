@@ -12,10 +12,11 @@ export default defineManifest({
     48: 'img/logo-48.png',
     128: 'img/logo-128.png',
   },
-  // action: {
-  //   default_popup: 'popup.html',
-  //   default_icon: 'img/logo-48.png',
-  // },
+  action: {
+    default_title: 'Click to open panel',
+    // default_popup: 'popup.html',
+    // default_icon: 'img/logo-48.png',
+  },
   options_page: 'options.html',
   background: {
     service_worker: 'src/background/index.ts',
@@ -40,5 +41,13 @@ export default defineManifest({
   // chrome_url_overrides: {
   //   newtab: 'newtab.html',
   // },
+  commands: {
+    _execute_action: {
+      suggested_key: {
+        default: 'Ctrl+B',
+        mac: 'Command+B',
+      },
+    },
+  },
   permissions: ['contextMenus', 'storage', 'sidePanel'],
 })
