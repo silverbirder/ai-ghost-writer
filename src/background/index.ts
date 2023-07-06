@@ -29,18 +29,14 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
       selectionText: info.selectionText,
     })
     console.info('before openai api call')
+    const { proofreading } = await chrome.storage.sync.get('proofreading')
+    console.log(proofreading);
     const completion = await openai.createChatCompletion({
       model: 'gpt-4',
       messages: [
         {
           role: 'system',
-          content:
-            'You are a professional ghostwriter.' +
-            'The data sent by the user is a blog manuscript.' +
-            'Clean up and output the manuscript.' +
-            'Output format is Markdown.' +
-            'Output language is Japanese.' +
-            'Write the Output as concisely as possible.',
+          content: proofreading,
         },
         { role: 'user', content: info.selectionText },
       ],
@@ -72,26 +68,29 @@ async function processStream(
       break
     }
     const text = decoder.decode(result.value, { stream: true })
-    const splitText = text.split('data: ')
-    if (splitText.length > 1) {
-      try {
-        const json = JSON.parse(splitText[1])
-        console.log('api json is', { json })
-        if (json.choices[0].delta.finish_reason === 'stop') {
-          console.info('chrome.runtime.sendMessage proofreading-end')
-          chrome.runtime.sendMessage({
-            name: 'proofreading-end',
-            selectionText,
-          })
-        } else {
-          console.info('chrome.runtime.sendMessage proofreading-inprogress')
-          chrome.runtime.sendMessage({
-            name: 'proofreading-inprogress',
-            data: json,
-            selectionText,
-          })
-        }
-      } catch (error) {}
+    const lines = text.split('\n\n')
+    for (const line of lines) {
+      const splitText = line.split('data: ')
+      if (splitText.length > 1) {
+        try {
+          const json = JSON.parse(splitText[1])
+          console.log('api json is', { json })
+          if (json.choices[0].delta.finish_reason === 'stop') {
+            console.info('chrome.runtime.sendMessage proofreading-end')
+            chrome.runtime.sendMessage({
+              name: 'proofreading-end',
+              selectionText,
+            })
+          } else {
+            console.info('chrome.runtime.sendMessage proofreading-inprogress')
+            chrome.runtime.sendMessage({
+              name: 'proofreading-inprogress',
+              data: json,
+              selectionText,
+            })
+          }
+        } catch (error) {}
+      }
     }
   }
 }
