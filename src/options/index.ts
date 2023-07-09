@@ -33,10 +33,9 @@ export class Options extends LitElement {
 
   connectedCallback() {
     super.connectedCallback()
-    chrome.storage.sync.get('apiToken').then(({ apiToken }) => {
+    chrome.storage.sync.get(['apiToken', 'proofreading']).then(({ apiToken, proofreading }) => {
+      console.log({ apiToken, proofreading })
       this.apiToken = apiToken
-    })
-    chrome.storage.sync.get('proofreading').then(({ proofreading }) => {
       this.proofreading = proofreading
     })
   }
@@ -53,7 +52,7 @@ export class Options extends LitElement {
         <h2>OpenAI System Message Settings</h2>
         <form id="systemMessage" @submit="${this._onMessageSubmit}">
           <label for="proofreading">Proofreading:</label>
-          <textarea id="proofreading" placeholder="" value="${this.proofreading}"></textarea>
+          <textarea id="proofreading" placeholder="">${this.proofreading}</textarea>
           <input type="submit" value="Save" />
         </form>
       </main>

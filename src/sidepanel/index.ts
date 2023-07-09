@@ -8,7 +8,19 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 @customElement('crx-sidepanel')
 export class Sidepanel extends LitElement {
   @state()
-  chats: { type: string; selectionText: string; comments: string[] }[] = []
+  chats: {
+    type: string
+    selectionText: string
+    comments: string[]
+    enabled: { stop: boolean; continue: boolean }
+  }[] = [
+    {
+      type: 'proofreading',
+      selectionText: 'A'.repeat(1000),
+      comments: ['B'.repeat(2000)],
+      enabled: { stop: true, continue: false },
+    },
+  ]
 
   _onMessage = ({
     name,
@@ -21,7 +33,15 @@ export class Sidepanel extends LitElement {
   }) => {
     switch (name) {
       case 'proofreading-start':
-        this.chats.push({ type: 'proofreading', selectionText, comments: [] })
+        this.chats.push({
+          type: 'proofreading',
+          selectionText,
+          comments: [],
+          enabled: {
+            stop: false,
+            continue: false,
+          },
+        })
         break
       case 'proofreading-inprogress':
         console.info(data.choices[0].delta.content)
@@ -29,6 +49,7 @@ export class Sidepanel extends LitElement {
         break
       case 'proofreading-end':
         console.info(this.chats[this.chats.length - 1].comments)
+        this.chats[this.chats.length - 1].enabled.stop = false
         break
     }
     this.requestUpdate()
@@ -52,18 +73,26 @@ export class Sidepanel extends LitElement {
         <h3>Comments from AI ghost writer</h3>
         ${this.chats.length > 0
           ? html`<div class="chat-container">
-              ${this.chats.map(({ comments, selectionText }) => {
+              ${this.chats.map(({ type, comments, selectionText, enabled }) => {
                 return html` <div class="chat-message user-message">
                     <img
                       src="https://google-account-photo.vercel.app/api/?account_id=101722346324226588907"
                       alt="You"
                       class="avatar"
                     />
-                    <p>次のテキストを校正して下さい。"${selectionText}"</p>
+                    <p>${type} "${selectionText}"</p>
                   </div>
                   <div class="chat-message bot-message">
                     <img src="/img/logo-128.png" alt="Bot" class="avatar" />
                     <p>${unsafeHTML(comments.join('').replace(/\n/g, '<br>'))}</p>
+                  </div>
+                  <div class="bot-message-buttons">
+                    ${enabled.stop === true
+                      ? html`<button class="message-button stop-button">Stop</button>`
+                      : ''}
+                    ${enabled.continue === true
+                      ? html`<button class="message-button continue-button">Continue</button>`
+                      : ''}
                   </div>`
               })}
             </div>`
@@ -89,11 +118,8 @@ export class Sidepanel extends LitElement {
     .chat-container {
       display: flex;
       flex-direction: column;
-      width: 500px;
       padding: 10px;
-      border: 1px solid #ddd;
       border-radius: 5px;
-      font-family: Arial, sans-serif;
     }
 
     .avatar {
@@ -105,41 +131,55 @@ export class Sidepanel extends LitElement {
     }
 
     .chat-message {
-      padding: 10px;
       margin-bottom: 10px;
       display: flex;
       align-items: center;
-    }
-
-    .user-message {
-      align-self: flex-start;
-      background-color: #white;
-      border-radius: 5px;
-    }
-
-    .bot-message {
-      align-self: flex-end;
-      background-color: #e0e0e0;
-      border-radius: 5px;
-    }
-    .bot-message p {
       min-height: 50px;
       width: 100%;
-      overflow: auto;
-    }
-
-    .chat-message h5 {
-      margin: 0 0 5px 0;
     }
 
     .chat-message p {
       margin: 0;
+      overflow-wrap: anywhere;
     }
 
-    @media (min-width: 480px) {
-      h3 {
-        max-width: none;
-      }
+    .user-message {
+      align-self: flex-start;
+    }
+
+    .bot-message {
+      align-self: flex-end;
+    }
+
+    .bot-message-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 10px;
+    }
+
+    .message-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .stop-button {
+      background-color: #f44336;
+    }
+
+    .stop-button:hover {
+      background-color: #d32f2f;
+    }
+
+    .continue-button {
+      background-color: #31c48d;
+    }
+
+    .continue-button:hover {
+      background-color: #28b082;
     }
   `
 }

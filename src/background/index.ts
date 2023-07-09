@@ -1,6 +1,14 @@
 console.info('chrome-ext template-lit-ts background script')
 import { Configuration, OpenAIApi } from 'openai-edge'
 
+const DEFAULT_PROOFREADING =
+  'You are a professional ghostwriter.' +
+  'The data sent by the user is a blog manuscript.' +
+  'Clean up and output the manuscript.' +
+  'Output format is Markdown.' +
+  'Output language is Japanese.' +
+  'Write the Output as concisely as possible.'
+
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error))
@@ -12,6 +20,12 @@ chrome.runtime.onInstalled.addListener(async () => {
     title: `Proofreading "%s"`,
     contexts: ['selection', 'editable'],
   })
+  const { proofreading } = await chrome.storage.sync.get('proofreading')
+  console.log(proofreading)
+  if (!proofreading) {
+    await chrome.storage.sync.set({ proofreading: DEFAULT_PROOFREADING })
+    console.log('set default proofreading')
+  }
 })
 
 chrome.contextMenus.onClicked.addListener(async (info) => {
@@ -30,7 +44,7 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     })
     console.info('before openai api call')
     const { proofreading } = await chrome.storage.sync.get('proofreading')
-    console.log(proofreading);
+    console.log(proofreading)
     const completion = await openai.createChatCompletion({
       model: 'gpt-4',
       messages: [
