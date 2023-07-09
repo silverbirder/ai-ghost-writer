@@ -9,11 +9,13 @@ const DEFAULT_PROOFREADING =
   'Output language is Japanese.' +
   'Write the Output as concisely as possible.'
 
+const DEFAULT_AVATAR_URL = 'https://www.gravatar.com/avatar/?d=mp'
+
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error))
 
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (detail) => {
   console.info('chrome.runtime.onInstalled')
   chrome.contextMenus.create({
     id: 'proofreading',
@@ -21,10 +23,17 @@ chrome.runtime.onInstalled.addListener(async () => {
     contexts: ['selection', 'editable'],
   })
   const { proofreading } = await chrome.storage.sync.get('proofreading')
-  console.log(proofreading)
   if (!proofreading) {
     await chrome.storage.sync.set({ proofreading: DEFAULT_PROOFREADING })
     console.log('set default proofreading')
+  }
+  const { avatarUrl } = await chrome.storage.sync.get('avatarUrl')
+  if (!avatarUrl) {
+    await chrome.storage.sync.set({ avatarUrl: DEFAULT_AVATAR_URL })
+    console.log('set default avatar url')
+  }
+  if (detail.reason === 'install') {
+    chrome.tabs.create({ url: 'options.html' })
   }
 })
 

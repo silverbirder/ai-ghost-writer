@@ -8,19 +8,14 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 @customElement('crx-sidepanel')
 export class Sidepanel extends LitElement {
   @state()
+  avatarUrl: string = ''
+  @state()
   chats: {
     type: string
     selectionText: string
     comments: string[]
     enabled: { stop: boolean; continue: boolean }
-  }[] = [
-    // {
-    //   type: 'proofreading',
-    //   selectionText: 'A'.repeat(1000),
-    //   comments: ['B'.repeat(2000)],
-    //   enabled: { stop: false, continue: false },
-    // },
-  ]
+  }[] = []
 
   _onMessage = ({
     name,
@@ -64,6 +59,9 @@ export class Sidepanel extends LitElement {
   connectedCallback() {
     super.connectedCallback()
     console.info('connectedCallback')
+    chrome.storage.sync.get('avatarUrl').then(({ avatarUrl }) => {
+      this.avatarUrl = avatarUrl
+    })
     chrome.runtime.onMessage.addListener(this._onMessage)
   }
 
@@ -94,11 +92,7 @@ export class Sidepanel extends LitElement {
           ? html`<div class="chat-container">
               ${this.chats.map(({ type, comments, selectionText, enabled }) => {
                 return html` <div class="chat-message user-message">
-                    <img
-                      src="https://google-account-photo.vercel.app/api/?account_id=101722346324226588907"
-                      alt="You"
-                      class="avatar"
-                    />
+                    <img src="${this.avatarUrl}" alt="You" class="avatar" />
                     <p>${type} "${selectionText}"</p>
                   </div>
                   <div class="chat-message bot-message">
@@ -125,7 +119,10 @@ export class Sidepanel extends LitElement {
                   </div>`
               })}
             </div>`
-          : ''}
+          : html`<p>
+              Please select the text on the browser, open the context menu by right-clicking, and
+              select 'Proofreading'.
+            </p>`}
       </main>
     `
   }
