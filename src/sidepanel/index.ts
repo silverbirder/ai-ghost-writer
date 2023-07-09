@@ -38,17 +38,19 @@ export class Sidepanel extends LitElement {
           selectionText,
           comments: [],
           enabled: {
-            stop: false,
+            stop: true,
             continue: false,
           },
         })
+        console.log('proofreading-start')
         break
       case 'proofreading-inprogress':
-        console.info(data.choices[0].delta.content)
-        this.chats[this.chats.length - 1].comments.push(data.choices[0].delta.content)
+        console.info(data)
+        this.chats[this.chats.length - 1].comments.push(data)
         break
       case 'proofreading-end':
         console.info(this.chats[this.chats.length - 1].comments)
+        this.chats[this.chats.length - 1].comments.push(data)
         this.chats[this.chats.length - 1].enabled.stop = false
         break
     }
@@ -65,6 +67,11 @@ export class Sidepanel extends LitElement {
     super.disconnectedCallback()
     console.info('disconnectedCallback')
     chrome.runtime.onMessage.removeListener(this._onMessage)
+  }
+
+  private async _onStopClick() {
+    console.log('onStopClick')
+    await chrome.runtime.sendMessage({ stop: true })
   }
 
   render() {
@@ -88,7 +95,12 @@ export class Sidepanel extends LitElement {
                   </div>
                   <div class="bot-message-buttons">
                     ${enabled.stop === true
-                      ? html`<button class="message-button stop-button">Stop</button>`
+                      ? html`<button
+                          class="message-button stop-button"
+                          @click="${this._onStopClick}"
+                        >
+                          Stop
+                        </button>`
                       : ''}
                     ${enabled.continue === true
                       ? html`<button class="message-button continue-button">Continue</button>`

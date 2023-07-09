@@ -28,6 +28,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
 })
 
+let controller: AbortController | undefined
 chrome.contextMenus.onClicked.addListener(async (info) => {
   const { apiToken: apiKey } = await chrome.storage.sync.get('apiToken')
   const configuration = new Configuration({
@@ -36,6 +37,8 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
   const openai = new OpenAIApi(configuration)
   console.info('chrome.contextMenus.onClicked')
   if (info.menuItemId === 'proofreading') {
+    controller = new AbortController()
+    const signal = controller.signal
     console.info('chrome.contextMenus.onClicked menuItemId proofreading')
     console.info('chrome.runtime.sendMessage proofreading-start')
     chrome.runtime.sendMessage({
@@ -45,26 +48,52 @@ chrome.contextMenus.onClicked.addListener(async (info) => {
     console.info('before openai api call')
     const { proofreading } = await chrome.storage.sync.get('proofreading')
     console.log(proofreading)
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-4',
-      messages: [
+    try {
+      const completion = await openai.createChatCompletion(
         {
-          role: 'system',
-          content: proofreading,
+          model: 'gpt-4',
+          messages: [
+            {
+              role: 'system',
+              content: proofreading,
+            },
+            { role: 'user', content: info.selectionText },
+          ],
+          temperature: 0,
+          stream: true,
         },
-        { role: 'user', content: info.selectionText },
-      ],
-      temperature: 0,
-      stream: true,
-    })
-    console.info('after openai api call')
-    if (!completion.body) return
-    if (completion.status !== 200) {
-      throw new Error('Request failed')
+        {
+          signal,
+        },
+      )
+      console.info('after openai api call')
+      if (!completion.body) return
+      if (completion.status !== 200) {
+        throw new Error('Request failed')
+      }
+      const reader: ReadableStreamReader<Uint8Array> = completion.body?.getReader()
+      const decoder: TextDecoder = new TextDecoder('utf-8')
+      processStream(reader, decoder, info.selectionText || '').catch((err: any) => {
+        console.error(err)
+        if (signal.aborted) {
+          console.log('signal.aborted.inner')
+          chrome.runtime.sendMessage({
+            name: 'proofreading-end',
+            selectionText: info.selectionText,
+            data: 'signal.aborted.inner',
+          })
+        }
+      })
+    } catch (error) {
+      if (signal.aborted) {
+        console.log('signal.aborted')
+        chrome.runtime.sendMessage({
+          name: 'proofreading-end',
+          selectionText: info.selectionText,
+          data: 'signal.aborted',
+        })
+      }
     }
-    const reader: ReadableStreamReader<Uint8Array> = completion.body?.getReader()
-    const decoder: TextDecoder = new TextDecoder('utf-8')
-    processStream(reader, decoder, info.selectionText || '').catch((err: any) => console.error(err))
   }
 })
 
@@ -93,13 +122,14 @@ async function processStream(
             console.info('chrome.runtime.sendMessage proofreading-end')
             chrome.runtime.sendMessage({
               name: 'proofreading-end',
+              data: 'END',
               selectionText,
             })
           } else {
             console.info('chrome.runtime.sendMessage proofreading-inprogress')
             chrome.runtime.sendMessage({
               name: 'proofreading-inprogress',
-              data: json,
+              data: json.choices[0].delta.content,
               selectionText,
             })
           }
@@ -108,5 +138,11 @@ async function processStream(
     }
   }
 }
+
+chrome.runtime.onMessage.addListener((request) => {
+  if (request.stop) {
+    controller?.abort()
+  }
+})
 
 export {}
