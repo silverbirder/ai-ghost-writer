@@ -14,22 +14,24 @@ export class Sidepanel extends LitElement {
     comments: string[]
     enabled: { stop: boolean; continue: boolean }
   }[] = [
-    {
-      type: 'proofreading',
-      selectionText: 'A'.repeat(1000),
-      comments: ['B'.repeat(2000)],
-      enabled: { stop: true, continue: false },
-    },
+    // {
+    //   type: 'proofreading',
+    //   selectionText: 'A'.repeat(1000),
+    //   comments: ['B'.repeat(2000)],
+    //   enabled: { stop: false, continue: false },
+    // },
   ]
 
   _onMessage = ({
     name,
     data,
     selectionText,
+    finishReason,
   }: {
     name: string
     data: any
     selectionText: string
+    finishReason: string
   }) => {
     switch (name) {
       case 'proofreading-start':
@@ -47,11 +49,13 @@ export class Sidepanel extends LitElement {
       case 'proofreading-inprogress':
         console.info(data)
         this.chats[this.chats.length - 1].comments.push(data)
+        this.chats[this.chats.length - 1].enabled.stop = true
         break
       case 'proofreading-end':
         console.info(this.chats[this.chats.length - 1].comments)
-        this.chats[this.chats.length - 1].comments.push(data)
         this.chats[this.chats.length - 1].enabled.stop = false
+        this.chats[this.chats.length - 1].enabled.continue =
+          finishReason === 'length' ? true : false
         break
     }
     this.requestUpdate()
@@ -72,8 +76,16 @@ export class Sidepanel extends LitElement {
   private async _onStopClick() {
     console.log('onStopClick')
     await chrome.runtime.sendMessage({ stop: true })
+    this.chats[this.chats.length - 1].enabled.stop = false
+    this.requestUpdate()
   }
 
+  private async _onContinueClick() {
+    const chat = this.chats[this.chats.length - 1]
+    await chrome.runtime.sendMessage({ continue: true, chat: chat })
+    this.chats[this.chats.length - 1].enabled.continue = false
+    this.requestUpdate()
+  }
   render() {
     return html`
       <main>
@@ -103,7 +115,12 @@ export class Sidepanel extends LitElement {
                         </button>`
                       : ''}
                     ${enabled.continue === true
-                      ? html`<button class="message-button continue-button">Continue</button>`
+                      ? html`<button
+                          class="message-button continue-button"
+                          @click="${this._onContinueClick}"
+                        >
+                          Continue
+                        </button>`
                       : ''}
                   </div>`
               })}
