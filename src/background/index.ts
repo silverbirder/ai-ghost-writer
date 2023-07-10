@@ -91,6 +91,15 @@ const onContextMenusClick = async ({
   skipStart?: boolean
 }) => {
   const { apiToken: apiKey } = await chrome.storage.sync.get('apiToken')
+  if (!apiKey) {
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'img/logo-128.png',
+      title: 'API Token Required',
+      message: 'The OpenAI API token is not set. Please set it in the extension options.',
+    })
+    return
+  }
   const configuration = new Configuration({
     apiKey,
   })
@@ -225,5 +234,9 @@ chrome.runtime.onMessage.addListener((request) => {
     })
   }
 })
+
+chrome.notifications.onClicked.addListener(() => {
+  chrome.runtime.openOptionsPage();
+});
 
 export {}

@@ -136,6 +136,11 @@ export class Options extends LitElement {
         <div class="form-group">
           <h3>OpenAI API Token</h3>
           <input type="text" id="apiToken" placeholder="sk-" value="${this.apiToken}" />
+          ${!this.apiToken
+            ? html`<p class="warning">
+                API token is required for this extension. Please enter it above.
+              </p>`
+            : null}
           <p>
             If you don't have an API token, you can generate one
             <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>.
@@ -267,6 +272,10 @@ export class Options extends LitElement {
 
     .submit-button:hover {
       background-color: #28a870;
+    }
+
+    .warning {
+      color: red;
     }
   `
 }

@@ -38,5 +38,5 @@ export default defineManifest({
       },
     },
   },
-  permissions: ['contextMenus', 'storage', 'sidePanel'],
+  permissions: ['contextMenus', 'storage', 'sidePanel', 'notifications'],
 })
