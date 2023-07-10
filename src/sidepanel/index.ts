@@ -54,13 +54,15 @@ export class Sidepanel extends LitElement {
         break
     }
     this.requestUpdate()
+    chrome.storage.sync.set({ chats: this.chats })
   }
 
   connectedCallback() {
     super.connectedCallback()
     console.info('connectedCallback')
-    chrome.storage.sync.get('avatarUrl').then(({ avatarUrl }) => {
+    chrome.storage.sync.get(['avatarUrl', 'chats']).then(({ avatarUrl, chats }) => {
       this.avatarUrl = avatarUrl
+      this.chats = chats || []
     })
     chrome.runtime.onMessage.addListener(this._onMessage)
   }
@@ -68,6 +70,7 @@ export class Sidepanel extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback()
     console.info('disconnectedCallback')
+    chrome.storage.sync.set({ chats: this.chats })
     chrome.runtime.onMessage.removeListener(this._onMessage)
   }
 
@@ -75,6 +78,12 @@ export class Sidepanel extends LitElement {
     console.log('onStopClick')
     await chrome.runtime.sendMessage({ stop: true })
     this.chats[this.chats.length - 1].enabled.stop = false
+    this.requestUpdate()
+  }
+
+  private _onRemoveClick(index: number) {
+    this.chats.splice(index, 1)
+    chrome.storage.sync.set({ chats: this.chats })
     this.requestUpdate()
   }
 
@@ -90,8 +99,12 @@ export class Sidepanel extends LitElement {
         <h3>Comments from AI ghost writer</h3>
         ${this.chats.length > 0
           ? html`<div class="chat-container">
-              ${this.chats.map(({ type, comments, selectionText, enabled }) => {
-                return html` <div class="chat-message user-message">
+              ${this.chats.map(({ type, comments, selectionText, enabled }, index) => {
+                return html`<div class="chat-section">
+                  <div class="remove-icon" @click="${() => this._onRemoveClick(index)}">
+                    &times;
+                  </div>
+                  <div class="chat-message user-message">
                     <img src="${this.avatarUrl}" alt="You" class="avatar" />
                     <p>${type} "${selectionText}"</p>
                   </div>
@@ -116,7 +129,8 @@ export class Sidepanel extends LitElement {
                           Continue
                         </button>`
                       : ''}
-                  </div>`
+                  </div>
+                </div>`
               })}
             </div>`
           : html`<p>
@@ -157,6 +171,7 @@ export class Sidepanel extends LitElement {
     }
 
     .chat-message {
+      position: relative;
       margin-bottom: 10px;
       display: flex;
       align-items: center;
@@ -206,6 +221,29 @@ export class Sidepanel extends LitElement {
 
     .continue-button:hover {
       background-color: #28b082;
+    }
+
+    .remove-icon {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      font-size: 20px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .chat-section {
+      border: 1px solid #ddd;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      position: relative;
     }
   `
 }
