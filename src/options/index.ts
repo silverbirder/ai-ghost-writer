@@ -187,10 +187,8 @@ export class Options extends LitElement {
       display: grid;
       grid-template-columns: 1fr 3fr;
       gap: 1rem;
-      background-color: #fff;
       padding: 1em;
       margin: 0 auto;
-      max-width: 530px;
       padding-top: 4rem;
       min-height: calc(100vh - 4rem - 52px);
     }
@@ -203,9 +201,6 @@ export class Options extends LitElement {
 
     .sidebar {
       padding: 1em;
-    }
-
-    .content {
     }
 
     h2,

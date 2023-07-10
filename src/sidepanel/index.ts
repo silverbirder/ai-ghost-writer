@@ -261,6 +261,7 @@ export class Sidepanel extends LitElement {
       left: -10px;
       font-size: 20px;
       background-color: white;
+      color: black;
       border: 1px solid #ddd;
       border-radius: 50%;
       width: 20px;
@@ -269,6 +270,13 @@ export class Sidepanel extends LitElement {
       align-items: center;
       justify-content: center;
       cursor: pointer;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .remove-icon {
+        background-color: black;
+        color: white;
+      }
     }
 
     .chat-section {
