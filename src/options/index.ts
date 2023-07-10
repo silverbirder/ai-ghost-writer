@@ -106,18 +106,18 @@ export class Options extends LitElement {
   renderContextMenu() {
     return html`
       <h2>Context Menu</h2>
+      <p>
+        Please enter the instruction for the action you wish to take (e.g., proofread) below. The
+        text you enter will be passed to
+        <a
+          href="https://platform.openai.com/docs/api-reference/chat/create#chat/create-messages"
+          target="_blank"
+          >the 'content' in the 'messages' parameter of the OpenAI's ChatAPI</a
+        >.
+      </p>
       <form id="contextMenu" @submit="${this._onContextMenu}">
         <div class="form-group">
           <h3>Proofreading</h3>
-          <p>
-            Please enter the instructions you want to be proofread. The text entered in the text
-            area will be used as the content parameter in
-            <a
-              href="https://platform.openai.com/docs/api-reference/chat/create#chat/create-messages"
-              target="_blank"
-              >the messages passed to the Chat in the OpenAI API</a
-            >.
-          </p>
           <textarea id="proofreading" rows="10">${this.proofreading}</textarea>
           <h3>Generate title</h3>
           <textarea id="generateTitle" rows="10">${this.generateTitle}</textarea>
