@@ -19,7 +19,7 @@ const DEFAULT_GENERATE_TITLE =
 const DEFAULT_GENERATE_FOLLOWING_TEXT =
   'You are a professional ghostwriter.' +
   'The data sent by the user is a blog content.' +
-  'Based on this blog content, generate the following text.' +
+  'Generate text that continues from this blog content.' +
   'Output language is Japanese.' +
   'Write the Output as concisely as possible.'
 
@@ -215,7 +215,7 @@ chrome.runtime.onMessage.addListener((request) => {
     const chat = request.chat
     console.log(chat)
     onContextMenusClick({
-      menuItemId: chat.type,
+      menuItemId: chat.name,
       selectionText: chat.selectionText,
       messages: [
         { role: 'assistant', content: chat.comments.join('') },

@@ -11,6 +11,7 @@ export class Sidepanel extends LitElement {
   avatarUrl: string = ''
   @state()
   chats: {
+    name: string
     type: string
     selectionText: string
     comments: string[]
@@ -31,6 +32,7 @@ export class Sidepanel extends LitElement {
     switch (name) {
       case 'proofreading-start':
         this.chats.push({
+          name: 'proofreading',
           type: 'Proofreading',
           selectionText,
           comments: [],
@@ -43,6 +45,7 @@ export class Sidepanel extends LitElement {
         break
       case 'generate-title-start':
         this.chats.push({
+          name: 'generate-title',
           type: 'Generate title',
           selectionText,
           comments: [],
@@ -55,6 +58,7 @@ export class Sidepanel extends LitElement {
         break
       case 'generate-following-text-start':
         this.chats.push({
+          name: 'generate-following-text',
           type: 'Generate following text',
           selectionText,
           comments: [],
