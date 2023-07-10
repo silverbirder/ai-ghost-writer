@@ -13,6 +13,12 @@ export class Options extends LitElement {
   proofreading = ''
 
   @state()
+  generateTitle = ''
+
+  @state()
+  generateFollowingText = ''
+
+  @state()
   activeMenu = 'userSettings'
 
   @state()
@@ -34,7 +40,12 @@ export class Options extends LitElement {
   private _onContextMenu(event: Event) {
     event.preventDefault()
     const proofreading = (this.shadowRoot!.getElementById('proofreading') as HTMLInputElement).value
-    chrome.storage.sync.set({ proofreading }, () => {
+    const generateTitle = (this.shadowRoot!.getElementById('generateTitle') as HTMLInputElement)
+      .value
+    const generateFollowingText = (
+      this.shadowRoot!.getElementById('generateFollowingText') as HTMLInputElement
+    ).value
+    chrome.storage.sync.set({ proofreading, generateTitle, generateFollowingText }, () => {
       if (chrome.runtime.lastError) {
         alert('An error occurred while saving your settings.')
       } else {
@@ -46,11 +57,13 @@ export class Options extends LitElement {
   connectedCallback() {
     super.connectedCallback()
     chrome.storage.sync
-      .get(['apiToken', 'proofreading', 'avatarUrl'])
-      .then(({ apiToken, proofreading, avatarUrl }) => {
+      .get(['apiToken', 'proofreading', 'generateTitle', 'generateFollowingText', 'avatarUrl'])
+      .then(({ apiToken, proofreading, generateTitle, generateFollowingText, avatarUrl }) => {
         console.log({ apiToken, proofreading })
         this.apiToken = apiToken
         this.proofreading = proofreading
+        this.generateTitle = generateTitle
+        this.generateFollowingText = generateFollowingText
         this.avatarUrl = avatarUrl
       })
   }
@@ -106,6 +119,10 @@ export class Options extends LitElement {
             >.
           </p>
           <textarea id="proofreading" rows="10">${this.proofreading}</textarea>
+          <h3>Generate title</h3>
+          <textarea id="generateTitle" rows="10">${this.generateTitle}</textarea>
+          <h3>Generate following text</h3>
+          <textarea id="generateFollowingText" rows="10">${this.generateFollowingText}</textarea>
         </div>
         <input type="submit" value="Save" class="submit-button" />
       </form>

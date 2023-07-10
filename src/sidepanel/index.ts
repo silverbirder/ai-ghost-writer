@@ -31,7 +31,7 @@ export class Sidepanel extends LitElement {
     switch (name) {
       case 'proofreading-start':
         this.chats.push({
-          type: 'proofreading',
+          type: 'Proofreading',
           selectionText,
           comments: [],
           enabled: {
@@ -41,12 +41,40 @@ export class Sidepanel extends LitElement {
         })
         console.log('proofreading-start')
         break
+      case 'generate-title-start':
+        this.chats.push({
+          type: 'Generate title',
+          selectionText,
+          comments: [],
+          enabled: {
+            stop: true,
+            continue: false,
+          },
+        })
+        console.log('generate-title-start')
+        break
+      case 'generate-following-text-start':
+        this.chats.push({
+          type: 'Generate following text',
+          selectionText,
+          comments: [],
+          enabled: {
+            stop: true,
+            continue: false,
+          },
+        })
+        console.log('generate-next-text-start')
+        break
       case 'proofreading-inprogress':
+      case 'generate-title-inprogress':
+      case 'generate-following-text-inprogress':
         console.info(data)
         this.chats[this.chats.length - 1].comments.push(data)
         this.chats[this.chats.length - 1].enabled.stop = true
         break
       case 'proofreading-end':
+      case 'generate-title-end':
+      case 'generate-following-text-end':
         console.info(this.chats[this.chats.length - 1].comments)
         this.chats[this.chats.length - 1].enabled.stop = false
         this.chats[this.chats.length - 1].enabled.continue =

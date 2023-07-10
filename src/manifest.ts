@@ -1,7 +1,7 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 
 export default defineManifest({
-  name: 'ai-ghost-writer',
+  name: 'AI Ghost Writer',
   description:
     'AI Ghostwriter is a Chrome extension that provides real-time AI assistance for your writing, offering a smoother and more effective writing experience.',
   version: '0.0.0',
