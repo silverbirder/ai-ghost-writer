@@ -106,18 +106,18 @@ export class Options extends LitElement {
   renderContextMenu() {
     return html`
       <h2>Context Menu</h2>
+      <p>
+        Please enter the instruction for the action you wish to take (e.g., proofread) below. The
+        text you enter will be passed to
+        <a
+          href="https://platform.openai.com/docs/api-reference/chat/create#chat/create-messages"
+          target="_blank"
+          >the 'content' in the 'messages' parameter of the OpenAI's ChatAPI</a
+        >.
+      </p>
       <form id="contextMenu" @submit="${this._onContextMenu}">
         <div class="form-group">
           <h3>Proofreading</h3>
-          <p>
-            Please enter the instructions you want to be proofread. The text entered in the text
-            area will be used as the content parameter in
-            <a
-              href="https://platform.openai.com/docs/api-reference/chat/create#chat/create-messages"
-              target="_blank"
-              >the messages passed to the Chat in the OpenAI API</a
-            >.
-          </p>
           <textarea id="proofreading" rows="10">${this.proofreading}</textarea>
           <h3>Generate title</h3>
           <textarea id="generateTitle" rows="10">${this.generateTitle}</textarea>
@@ -136,6 +136,11 @@ export class Options extends LitElement {
         <div class="form-group">
           <h3>OpenAI API Token</h3>
           <input type="text" id="apiToken" placeholder="sk-" value="${this.apiToken}" />
+          ${!this.apiToken
+            ? html`<p class="warning">
+                API token is required for this extension. Please enter it above.
+              </p>`
+            : null}
           <p>
             If you don't have an API token, you can generate one
             <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>.
@@ -182,10 +187,8 @@ export class Options extends LitElement {
       display: grid;
       grid-template-columns: 1fr 3fr;
       gap: 1rem;
-      background-color: #fff;
       padding: 1em;
       margin: 0 auto;
-      max-width: 530px;
       padding-top: 4rem;
       min-height: calc(100vh - 4rem - 52px);
     }
@@ -198,9 +201,6 @@ export class Options extends LitElement {
 
     .sidebar {
       padding: 1em;
-    }
-
-    .content {
     }
 
     h2,
@@ -267,6 +267,10 @@ export class Options extends LitElement {
 
     .submit-button:hover {
       background-color: #28a870;
+    }
+
+    .warning {
+      color: red;
     }
   `
 }

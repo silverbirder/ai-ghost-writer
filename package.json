@@ -1,8 +1,8 @@
 {
   "name": "ai-ghost-writer",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "silverbirder",
-  "description": "",
+  "description": "AI Ghostwriter, a Chrome extension, provides real-time AI help for smoother, more effective writing.",
   "type": "module",
   "license": "MIT",
   "keywords": [

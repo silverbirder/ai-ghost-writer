@@ -4,24 +4,24 @@ import { crx } from '@crxjs/vite-plugin'
 import manifest from './src/manifest'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  build: {
-    emptyOutDir: true,
-    outDir: 'build',
-    rollupOptions: {
-      input: {
-        options: path.resolve('options.html'),
-        popup: path.resolve('popup.html'),
-        newtab: path.resolve('newtab.html'),
-        sidepanel: path.resolve('sidepanel.html'),
-      },
-      output: {
-        chunkFileNames: 'assets/chunk-[hash].js',
+export default defineConfig(({mode}) => {
+  return {
+    build: {
+      emptyOutDir: true,
+      outDir: 'build',
+      rollupOptions: {
+        input: {
+          options: path.resolve('options.html'),
+          sidepanel: path.resolve('sidepanel.html'),
+        },
+        output: {
+          chunkFileNames: 'assets/chunk-[hash].js',
+        },
       },
     },
-  },
-  esbuild: {
-    // drop: ['console', 'debugger'],
-  },
-  plugins: [crx({ manifest })],
+    esbuild: {
+      drop: mode === 'production' ? ['console', 'debugger'] : [],
+    },
+    plugins: [crx({ manifest })],
+  }
 })

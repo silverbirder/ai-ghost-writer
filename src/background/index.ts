@@ -19,7 +19,7 @@ const DEFAULT_GENERATE_TITLE =
 const DEFAULT_GENERATE_FOLLOWING_TEXT =
   'You are a professional ghostwriter.' +
   'The data sent by the user is a blog content.' +
-  'Based on this blog content, generate the following text.' +
+  'Generate text that continues from this blog content.' +
   'Output language is Japanese.' +
   'Write the Output as concisely as possible.'
 
@@ -91,6 +91,15 @@ const onContextMenusClick = async ({
   skipStart?: boolean
 }) => {
   const { apiToken: apiKey } = await chrome.storage.sync.get('apiToken')
+  if (!apiKey) {
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'img/logo-128.png',
+      title: 'API Token Required',
+      message: 'The OpenAI API token is not set. Please set it in the extension options.',
+    })
+    return
+  }
   const configuration = new Configuration({
     apiKey,
   })
@@ -135,7 +144,7 @@ const onContextMenusClick = async ({
         messages: myMessages,
         temperature: 0,
         stream: true,
-        max_tokens: 128,
+        max_tokens: 256,
       },
       {
         signal,
@@ -215,7 +224,7 @@ chrome.runtime.onMessage.addListener((request) => {
     const chat = request.chat
     console.log(chat)
     onContextMenusClick({
-      menuItemId: chat.type,
+      menuItemId: chat.name,
       selectionText: chat.selectionText,
       messages: [
         { role: 'assistant', content: chat.comments.join('') },
@@ -225,5 +234,9 @@ chrome.runtime.onMessage.addListener((request) => {
     })
   }
 })
+
+chrome.notifications.onClicked.addListener(() => {
+  chrome.runtime.openOptionsPage();
+});
 
 export {}
