@@ -13,6 +13,12 @@ export class Options extends LitElement {
   proofreading = ''
 
   @state()
+  generateTitle = ''
+
+  @state()
+  generateFollowingText = ''
+
+  @state()
   activeMenu = 'userSettings'
 
   @state()
@@ -34,7 +40,12 @@ export class Options extends LitElement {
   private _onContextMenu(event: Event) {
     event.preventDefault()
     const proofreading = (this.shadowRoot!.getElementById('proofreading') as HTMLInputElement).value
-    chrome.storage.sync.set({ proofreading }, () => {
+    const generateTitle = (this.shadowRoot!.getElementById('generateTitle') as HTMLInputElement)
+      .value
+    const generateFollowingText = (
+      this.shadowRoot!.getElementById('generateFollowingText') as HTMLInputElement
+    ).value
+    chrome.storage.sync.set({ proofreading, generateTitle, generateFollowingText }, () => {
       if (chrome.runtime.lastError) {
         alert('An error occurred while saving your settings.')
       } else {
@@ -46,11 +57,13 @@ export class Options extends LitElement {
   connectedCallback() {
     super.connectedCallback()
     chrome.storage.sync
-      .get(['apiToken', 'proofreading', 'avatarUrl'])
-      .then(({ apiToken, proofreading, avatarUrl }) => {
+      .get(['apiToken', 'proofreading', 'generateTitle', 'generateFollowingText', 'avatarUrl'])
+      .then(({ apiToken, proofreading, generateTitle, generateFollowingText, avatarUrl }) => {
         console.log({ apiToken, proofreading })
         this.apiToken = apiToken
         this.proofreading = proofreading
+        this.generateTitle = generateTitle
+        this.generateFollowingText = generateFollowingText
         this.avatarUrl = avatarUrl
       })
   }
@@ -61,16 +74,16 @@ export class Options extends LitElement {
         <aside class="sidebar">
           <nav>
             <button
-              class="${this.activeMenu === 'contextMenu' ? 'active' : ''}"
-              @click="${() => (this.activeMenu = 'contextMenu')}"
-            >
-              Context Menu
-            </button>
-            <button
               class="${this.activeMenu === 'userSettings' ? 'active' : ''}"
               @click="${() => (this.activeMenu = 'userSettings')}"
             >
               User Settings
+            </button>
+            <button
+              class="${this.activeMenu === 'contextMenu' ? 'active' : ''}"
+              @click="${() => (this.activeMenu = 'contextMenu')}"
+            >
+              Context Menu
             </button>
           </nav>
         </aside>
@@ -93,20 +106,23 @@ export class Options extends LitElement {
   renderContextMenu() {
     return html`
       <h2>Context Menu</h2>
-      <!-- context menu settings form goes here -->
       <form id="contextMenu" @submit="${this._onContextMenu}">
         <div class="form-group">
-          <label for="proofreading">Proofreading:</label>
-          <textarea id="proofreading" rows="10">${this.proofreading}</textarea>
+          <h3>Proofreading</h3>
           <p>
-            Please enter the instructions you want to be proofread. The text area below represents
-            the contents of
+            Please enter the instructions you want to be proofread. The text entered in the text
+            area will be used as the content parameter in
             <a
               href="https://platform.openai.com/docs/api-reference/chat/create#chat/create-messages"
               target="_blank"
-              >OpenAI's Role: System messages</a
+              >the messages passed to the Chat in the OpenAI API</a
             >.
           </p>
+          <textarea id="proofreading" rows="10">${this.proofreading}</textarea>
+          <h3>Generate title</h3>
+          <textarea id="generateTitle" rows="10">${this.generateTitle}</textarea>
+          <h3>Generate following text</h3>
+          <textarea id="generateFollowingText" rows="10">${this.generateFollowingText}</textarea>
         </div>
         <input type="submit" value="Save" class="submit-button" />
       </form>
@@ -118,13 +134,13 @@ export class Options extends LitElement {
       <h2>User Settings</h2>
       <form id="UserSettings" @submit="${this._onUserSettings}">
         <div class="form-group">
-          <label for="apiToken">OpenAI API Token:</label>
+          <h3>OpenAI API Token</h3>
           <input type="text" id="apiToken" placeholder="sk-" value="${this.apiToken}" />
           <p>
             If you don't have an API token, you can generate one
             <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>.
           </p>
-          <label for="avatarUrl">Your Avatar Url:</label>
+          <h3>Your Avatar Url</h3>
           <input type="text" id="avatarUrl" value="${this.avatarUrl}" />
           <p>
             Want to display your Google Account image? Please use
@@ -187,7 +203,8 @@ export class Options extends LitElement {
     .content {
     }
 
-    h2 {
+    h2,
+    h3 {
       color: #31c48d;
     }
 
