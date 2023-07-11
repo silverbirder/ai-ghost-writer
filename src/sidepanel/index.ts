@@ -76,6 +76,8 @@ export class Sidepanel extends LitElement {
       this.chats = chats || []
     })
     chrome.runtime.onMessage.addListener(this._onMessage)
+    const hello = chrome.i18n.getMessage('hello')
+    console.log(hello);
   }
 
   disconnectedCallback() {
