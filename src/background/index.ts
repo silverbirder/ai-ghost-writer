@@ -100,6 +100,20 @@ const onContextMenusClick = async ({
     })
     return
   }
+
+  try {
+    await chrome.runtime.sendMessage({
+      name: `smoke`,
+    })
+  } catch {
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'img/logo-128.png',
+      title: 'Communication Error',
+      message: 'Please open the side panel and select AI Ghostwriter',
+    })
+    return
+  }
   const configuration = new Configuration({
     apiKey,
   })
@@ -236,7 +250,7 @@ chrome.runtime.onMessage.addListener((request) => {
 })
 
 chrome.notifications.onClicked.addListener(() => {
-  chrome.runtime.openOptionsPage();
-});
+  chrome.runtime.openOptionsPage()
+})
 
 export {}

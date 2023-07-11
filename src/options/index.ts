@@ -85,6 +85,12 @@ export class Options extends LitElement {
             >
               Context Menu
             </button>
+            <button
+              class="${this.activeMenu === 'shortcuts' ? 'active' : ''}"
+              @click="${() => (this.activeMenu = 'shortcuts')}"
+            >
+              Shortcuts
+            </button>
           </nav>
         </aside>
         <main class="content">${this.renderContent()}</main>
@@ -98,6 +104,8 @@ export class Options extends LitElement {
         return this.renderContextMenu()
       case 'userSettings':
         return this.renderUserSettings()
+      case 'shortcuts':
+        return this.renderShortcuts()
       default:
         return ''
     }
@@ -171,6 +179,22 @@ export class Options extends LitElement {
     `
   }
 
+  renderShortcuts() {
+    return html`
+      <h2>Shortcuts</h2>
+      <form>
+        <div class="form-group">
+          <p>
+            To view or change the shortcuts for this extension, please navigate to the following
+            URL:
+          </p>
+          <code>chrome://extensions/shortcuts</code>
+          <p>There is a defined shortcut for opening the side panel. It's very convenient!</p>
+        </div>
+      </form>
+    `
+  }
+
   static styles = css`
     :global(body) {
       min-width: 20rem;
@@ -191,6 +215,7 @@ export class Options extends LitElement {
       margin: 0 auto;
       padding-top: 4rem;
       min-height: calc(100vh - 4rem - 52px);
+      max-width: 520px;
     }
 
     @media (max-width: 600px) {
