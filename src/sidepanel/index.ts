@@ -110,6 +110,7 @@ export class Sidepanel extends LitElement {
     console.log('onStopClick')
     await chrome.runtime.sendMessage({ stop: true })
     this.chats[this.chats.length - 1].enabled.stop = false
+    chrome.storage.sync.set({ chats: this.chats })
     this.requestUpdate()
   }
 
@@ -123,6 +124,7 @@ export class Sidepanel extends LitElement {
     const chat = this.chats[this.chats.length - 1]
     await chrome.runtime.sendMessage({ continue: true, chat: chat })
     this.chats[this.chats.length - 1].enabled.continue = false
+    chrome.storage.sync.set({ chats: this.chats })
     this.requestUpdate()
   }
   render() {

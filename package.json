@@ -18,6 +18,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "zip": "zip -r build.zip build/",
     "fmt": "prettier --write '**/*.{ts,json,css,scss,md}'"
   },
   "dependencies": {
