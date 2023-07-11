@@ -4,7 +4,7 @@ export default defineManifest({
   name: 'AI Ghostwriter',
   description:
     'AI Ghostwriter, a Chrome extension, provides real-time AI help for smoother, more effective writing.',
-  version: '0.0.1',
+  version: '0.0.2',
   manifest_version: 3,
   icons: {
     16: 'img/logo-16.png',
