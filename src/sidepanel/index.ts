@@ -30,6 +30,9 @@ export class Sidepanel extends LitElement {
     finishReason: string
   }) => {
     switch (name) {
+      case 'smoke':
+        console.log('smoke ok!')
+        return
       case 'proofreading-start':
         this.chats.push({
           name: 'proofreading',
