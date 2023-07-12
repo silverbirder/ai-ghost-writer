@@ -1,6 +1,107 @@
 {
-  "hello": {
-    "message": "こんにちは！",
-    "description": "挨拶です"
+  "proofreading": {
+    "message": "校正"
+  },
+  "generate_title": {
+    "message": "タイトル生成"
+  },
+  "generate_following_text": {
+    "message": "続きのテキスト生成"
+  },
+  "notification_api_token_required_title": {
+    "message": "API Tokenが必要"
+  },
+  "notification_api_token_required_message": {
+    "message": "OpenAI API トークンが設定されていません。拡張機能オプションで設定してください。"
+  },
+  "notification_communication_error_title": {
+    "message": "通信エラー"
+  },
+  "notification_communication_error_message": {
+    "message": "サイドパネルを開き、AIゴーストライターを選択してください。"
+  },
+  "openai_message_user_continue": {
+    "message": "Continue"
+  },
+  "alert_last_error": {
+    "message": "設定の保存中にエラーが発生しました。"
+  },
+  "alert_success": {
+    "message": "設定が正常に保存されました！"
+  },
+  "context_new_menu": {
+    "message": "新しいメニュー"
+  },
+  "user_settings": {
+    "message": "ユーザー設定"
+  },
+  "context_menu": {
+    "message": "コンテキストメニュー"
+  },
+  "shortcuts": {
+    "message": "ショートカット"
+  },
+  "shortcut_view_or_change": {
+    "message": "この拡張機能のショートカットを表示または変更するには、次のURLにアクセスしてください。"
+  },
+  "shortcut_very_convenient": {
+    "message": "サイドパネルを開くためのショートカットが定義されています。とても便利です！"
+  },
+  "content_please_enter": {
+    "message": "ご希望のアクション（校正など）の指示を以下に入力してください。入力されたテキストは"
+  },
+  "content_in_the_messages": {
+    "message": "OpenAIのChatAPIに設定する'messages'パラメータの'content'に含まれます。"
+  },
+  "menu": {
+    "message": "メニュー"
+  },
+  "delete_menu": {
+    "message": "メニュー削除"
+  },
+  "add_menu": {
+    "message": "メニュー追加"
+  },
+  "menu_name": {
+    "message": "メニュー名"
+  },
+  "content": {
+    "message": "コンテンツ"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "api_token_is_required": {
+    "message": "この拡張機能にはAPIトークンが必要です。入力してください。"
+  },
+  "if_you_dont_have_api_token": {
+    "message": "APIトークンをお持ちでない場合は、APIトークンを生成することができます。"
+  },
+  "here": {
+    "message": "こちら"
+  },
+  "your_avatar_url": {
+    "message": "あなたのアバターURL"
+  },
+  "want_to_display": {
+    "message": "Googleアカウントの画像を表示しますか？次のURLをご利用ください。"
+  },
+  "the_your_account_id": {
+    "message": "YOUR_ACCOUNT_IDは、"
+  },
+  "and_executing_the_api": {
+    "message": "でAPIを実行して見つけることができます。レスポンスにpeople/YOUR_ACCOUNT_IDが含まれるので、それをYOUR_ACCOUNT_IDとしてお使いください。詳しくは"
+  },
+  "comments_from_ai": {
+    "message": "AIゴーストライターからのコメント"
+  },
+  "stop": {
+    "message": "停止"
+  },
+  "continue": {
+    "message": "続き"
+  },
+  "please_select_the_text": {
+    "message": "ブラウザ上でテキストを選択し、右クリックでコンテキストメニューを開き、「AI Ghostwriter」を選択してください。"
   }
 }

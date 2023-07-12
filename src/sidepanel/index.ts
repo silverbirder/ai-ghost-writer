@@ -77,7 +77,7 @@ export class Sidepanel extends LitElement {
     })
     chrome.runtime.onMessage.addListener(this._onMessage)
     const hello = chrome.i18n.getMessage('hello')
-    console.log(hello);
+    console.log(hello)
   }
 
   disconnectedCallback() {
@@ -103,7 +103,7 @@ export class Sidepanel extends LitElement {
 
   private async _onContinueClick() {
     const chat = this.chats[this.chats.length - 1]
-    console.log({chat});
+    console.log({ chat })
     await chrome.runtime.sendMessage({ continue: true, chat: chat })
     this.chats[this.chats.length - 1].enabled.continue = false
     chrome.storage.sync.set({ chats: this.chats })
@@ -112,7 +112,7 @@ export class Sidepanel extends LitElement {
   render() {
     return html`
       <main>
-        <h3>Comments from AI ghost writer</h3>
+        <h3>${chrome.i18n.getMessage('comments_from_ai')}</h3>
         ${this.chats.length > 0
           ? html`<div class="chat-container">
               ${this.chats.map(({ type, comments, selectionText, enabled }, index) => {
@@ -134,7 +134,7 @@ export class Sidepanel extends LitElement {
                           class="message-button stop-button"
                           @click="${this._onStopClick}"
                         >
-                          Stop
+                          ${chrome.i18n.getMessage('stop')}
                         </button>`
                       : ''}
                     ${enabled.continue === true
@@ -142,17 +142,14 @@ export class Sidepanel extends LitElement {
                           class="message-button continue-button"
                           @click="${this._onContinueClick}"
                         >
-                          Continue
+                          ${chrome.i18n.getMessage('continue')}
                         </button>`
                       : ''}
                   </div>
                 </div>`
               })}
             </div>`
-          : html`<p>
-              Please select the text on the browser, open the context menu by right-clicking, and
-              select 'AI Ghostwriter'.
-            </p>`}
+          : html`<p>${chrome.i18n.getMessage('please_select_the_text')}</p>`}
       </main>
     `
   }
@@ -266,6 +263,7 @@ export class Sidepanel extends LitElement {
     .chat-section {
       border: 1px solid #ddd;
       margin-bottom: 10px;
+      padding: 5px;
       border-radius: 5px;
       position: relative;
     }

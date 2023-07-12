@@ -24,7 +24,7 @@ export default defineManifest({
   side_panel: {
     default_path: 'sidepanel.html',
   },
-  default_locale: 'ja',
+  default_locale: 'en',
   web_accessible_resources: [
     {
       resources: ['img/logo-16.png', 'img/logo-34.png', 'img/logo-48.png', 'img/logo-128.png'],

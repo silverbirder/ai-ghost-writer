@@ -43,11 +43,19 @@ chrome.runtime.onInstalled.addListener(async (detail) => {
   console.log(contextMenus)
   if (!contextMenus || contextMenus.length === 0) {
     const defaultContextMenus = [
-      { id: generateUUID(), name: 'Proofreading', content: DEFAULT_PROOFREADING },
-      { id: generateUUID(), name: 'Generate title', content: DEFAULT_GENERATE_TITLE },
       {
         id: generateUUID(),
-        name: 'Generate following text',
+        name: chrome.i18n.getMessage('proofreading'),
+        content: DEFAULT_PROOFREADING,
+      },
+      {
+        id: generateUUID(),
+        name: chrome.i18n.getMessage('generate_title'),
+        content: DEFAULT_GENERATE_TITLE,
+      },
+      {
+        id: generateUUID(),
+        name: chrome.i18n.getMessage('generate_following_text'),
         content: DEFAULT_GENERATE_FOLLOWING_TEXT,
       },
     ]
@@ -98,8 +106,8 @@ const onContextMenusClick = async ({
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'img/logo-128.png',
-      title: 'API Token Required',
-      message: 'The OpenAI API token is not set. Please set it in the extension options.',
+      title: chrome.i18n.getMessage('notification_api_token_required_title'),
+      message: chrome.i18n.getMessage('notification_api_token_required_message'),
     })
     return
   }
@@ -112,8 +120,8 @@ const onContextMenusClick = async ({
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'img/logo-128.png',
-      title: 'Communication Error',
-      message: 'Please open the side panel and select AI Ghostwriter',
+      title: chrome.i18n.getMessage('notification_communication_error_title'),
+      message: chrome.i18n.getMessage('notification_communication_error_message'),
     })
     return
   }
@@ -157,7 +165,7 @@ const onContextMenusClick = async ({
       messages: myMessages,
       temperature: 0,
       stream: true,
-      max_tokens: 256,
+      max_tokens: 12,
     },
     {
       signal,
@@ -241,7 +249,7 @@ chrome.runtime.onMessage.addListener((request) => {
       selectionText: chat.selectionText,
       messages: [
         { role: 'assistant', content: chat.comments.join('') },
-        { role: 'user', content: 'Continue' },
+        { role: 'user', content: chrome.i18n.getMessage('openai_message_user_continue') },
       ],
       skipStart: true,
     })
