@@ -2,25 +2,25 @@ console.info('chrome-ext template-lit-ts background script')
 import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai-edge'
 
 const DEFAULT_PROOFREADING =
-  'You are a professional ghostwriter.' +
-  'The data sent by the user is a blog manuscript.' +
-  'Clean up and output the manuscript.' +
-  'Output format is Markdown.' +
-  'Output language is Japanese.' +
+  'You are a professional ghostwriter.\n' +
+  'The data sent by the user is a blog manuscript.\n' +
+  'Clean up and output the manuscript.\n' +
+  'Output format is Markdown.\n' +
+  'Output language is Japanese.\n' +
   'Write the Output as concisely as possible.'
 
 const DEFAULT_GENERATE_TITLE =
-  'You are a professional ghostwriter.' +
-  'The data sent by the user is a blog content.' +
-  'Suggest five optimal titles from the blog content.' +
-  'Output language is Japanese.' +
+  'You are a professional ghostwriter.\n' +
+  'The data sent by the user is a blog content.\n' +
+  'Suggest five optimal titles from the blog content.\n' +
+  'Output language is Japanese.\n' +
   'Write the Output as concisely as possible.'
 
 const DEFAULT_GENERATE_FOLLOWING_TEXT =
-  'You are a professional ghostwriter.' +
-  'The data sent by the user is a blog content.' +
-  'Generate text that continues from this blog content.' +
-  'Output language is Japanese.' +
+  'You are a professional ghostwriter.\n' +
+  'The data sent by the user is a blog content.\n' +
+  'Generate text that continues from this blog content.\n' +
+  'Output language is Japanese.\n' +
   'Write the Output as concisely as possible.'
 
 const DEFAULT_AVATAR_URL = 'https://www.gravatar.com/avatar/?d=mp'
@@ -41,7 +41,7 @@ chrome.runtime.onInstalled.addListener(async (detail) => {
   console.info('chrome.runtime.onInstalled')
   let { contextMenus } = await chrome.storage.sync.get('contextMenus')
   console.log(contextMenus)
-  if (!contextMenus) {
+  if (!contextMenus || contextMenus.length === 0) {
     const defaultContextMenus = [
       { id: generateUUID(), name: 'Proofreading', content: DEFAULT_PROOFREADING },
       { id: generateUUID(), name: 'Generate title', content: DEFAULT_GENERATE_TITLE },

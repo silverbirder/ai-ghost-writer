@@ -163,7 +163,12 @@ export class Options extends LitElement {
           <button type="button" class="add-menu-button" @click="${this.addMenu}">
             <span class="plus-icon">&#43;</span> Add Menu
           </button>
-          <input type="submit" value="Save" class="submit-button" />
+          <input
+            type="submit"
+            value="Save"
+            class="submit-button"
+            ?disabled="${this.contextMenus.length === 0}"
+          />
         </div>
       </form>
     `
@@ -313,6 +318,11 @@ export class Options extends LitElement {
       width: 93%;
     }
 
+    input[type='submit']:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
     .submit-button {
       padding: 0.5em 1em;
       color: #fff;
@@ -349,6 +359,7 @@ export class Options extends LitElement {
     .button-group {
       display: flex;
       justify-content: space-between;
+      width: 98%;
     }
 
     .menu-header {
