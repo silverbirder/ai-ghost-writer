@@ -1,4 +1,10 @@
 {
+  "appName": {
+    "message": "AIゴーストライター"
+  },
+  "appDesc": {
+    "message": "Chromeの拡張機能であるAIゴーストライターは、よりスムーズで効果的なライティングのために、リアルタイムのAIヘルプを提供します。"
+  },
   "proofreading": {
     "message": "校正"
   },

@@ -1,4 +1,10 @@
 {
+  "appName": {
+    "message": "AI Ghostwriter"
+  },
+  "appDesc": {
+    "message": "AI Ghostwriter, a Chrome extension, provides real-time AI help for smoother, more effective writing."
+  },
   "proofreading": {
     "message": "Proofreading"
   },
