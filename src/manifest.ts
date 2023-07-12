@@ -1,9 +1,8 @@
 import { defineManifest } from '@crxjs/vite-plugin'
 
 export default defineManifest({
-  name: 'AI Ghostwriter',
-  description:
-    'AI Ghostwriter, a Chrome extension, provides real-time AI help for smoother, more effective writing.',
+  name: '__MSG_appName__',
+  description: '__MSG_appDesc__',
   version: '0.0.3',
   manifest_version: 3,
   icons: {
@@ -24,6 +23,7 @@ export default defineManifest({
   side_panel: {
     default_path: 'sidepanel.html',
   },
+  default_locale: 'en',
   web_accessible_resources: [
     {
       resources: ['img/logo-16.png', 'img/logo-34.png', 'img/logo-48.png', 'img/logo-128.png'],

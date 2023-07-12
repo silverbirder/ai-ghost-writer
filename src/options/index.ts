@@ -24,9 +24,9 @@ export class Options extends LitElement {
     const avatarUrl = (this.shadowRoot!.getElementById('avatarUrl') as HTMLInputElement).value
     chrome.storage.sync.set({ apiToken, avatarUrl }, () => {
       if (chrome.runtime.lastError) {
-        alert('An error occurred while saving your settings.')
+        alert(chrome.i18n.getMessage('alert_last_error'))
       } else {
-        alert('Your settings have been saved successfully!')
+        alert(chrome.i18n.getMessage('alert_success'))
       }
     })
   }
@@ -39,9 +39,9 @@ export class Options extends LitElement {
     })
     chrome.storage.sync.set({ contextMenus: this.contextMenus }, () => {
       if (chrome.runtime.lastError) {
-        alert('An error occurred while saving your settings.')
+        alert(chrome.i18n.getMessage('alert_last_error'))
       } else {
-        alert('Your settings have been saved successfully!')
+        alert(chrome.i18n.getMessage('alert_success'))
         chrome.contextMenus.removeAll()
         this.contextMenus.forEach((contextMenu) => {
           chrome.contextMenus.create({
@@ -63,7 +63,11 @@ export class Options extends LitElement {
   }
 
   addMenu() {
-    this.contextMenus.push({ id: this.generateUUID(), name: 'New Menu', content: '' })
+    this.contextMenus.push({
+      id: this.generateUUID(),
+      name: chrome.i18n.getMessage('context_new_menu'),
+      content: '',
+    })
     this.requestUpdate()
   }
 
@@ -92,19 +96,19 @@ export class Options extends LitElement {
               class="${this.activeMenu === 'userSettings' ? 'active' : ''}"
               @click="${() => (this.activeMenu = 'userSettings')}"
             >
-              User Settings
+              ${chrome.i18n.getMessage('user_settings')}
             </button>
             <button
               class="${this.activeMenu === 'contextMenu' ? 'active' : ''}"
               @click="${() => (this.activeMenu = 'contextMenu')}"
             >
-              Context Menu
+              ${chrome.i18n.getMessage('context_menu')}
             </button>
             <button
               class="${this.activeMenu === 'shortcuts' ? 'active' : ''}"
               @click="${() => (this.activeMenu = 'shortcuts')}"
             >
-              Shortcuts
+              ${chrome.i18n.getMessage('shortcuts')}
             </button>
           </nav>
         </aside>
@@ -128,14 +132,13 @@ export class Options extends LitElement {
 
   renderContextMenu() {
     return html`
-      <h2>Context Menu</h2>
+      <h2>${chrome.i18n.getMessage('context_menu')}</h2>
       <p>
-        Please enter the instruction for the action you wish to take (e.g., proofread) below. The
-        text you enter will be passed to
+        ${chrome.i18n.getMessage('content_please_enter')}
         <a
           href="https://platform.openai.com/docs/api-reference/chat/create#chat/create-messages"
           target="_blank"
-          >the 'content' in the 'messages' parameter of the OpenAI's ChatAPI</a
+          >${chrome.i18n.getMessage('content_in_the_messages')}</a
         >.
       </p>
       <form id="contextMenu" @submit="${this._onContextMenu}">
@@ -143,29 +146,29 @@ export class Options extends LitElement {
           (menu, index) => html`
             <div class="form-group">
               <div class="menu-header">
-                <h3>Menu No.${index + 1}</h3>
+                <h3>${chrome.i18n.getMessage('menu')} No.${index + 1}</h3>
                 <button
                   type="button"
                   class="delete-menu-button"
                   @click="${() => this.deleteMenu(menu.id)}"
                 >
-                  &#10006; Delete menu
+                  &#10006; ${chrome.i18n.getMessage('delete_menu')}
                 </button>
               </div>
-              <label for="name${index}">Menu Name</label>
+              <label for="name${index}">${chrome.i18n.getMessage('menu_name')}</label>
               <input type="text" id="name${index}" value="${menu.name}" />
-              <label for="content${index}">Content</label>
+              <label for="content${index}">${chrome.i18n.getMessage('content')}</label>
               <textarea id="content${index}" rows="10">${menu.content}</textarea>
             </div>
           `,
         )}
         <div class="button-group">
           <button type="button" class="add-menu-button" @click="${this.addMenu}">
-            <span class="plus-icon">&#43;</span> Add Menu
+            <span class="plus-icon">&#43;</span> ${chrome.i18n.getMessage('add_menu')}
           </button>
           <input
             type="submit"
-            value="Save"
+            value="${chrome.i18n.getMessage('save')}"
             class="submit-button"
             ?disabled="${this.contextMenus.length === 0}"
           />
@@ -176,57 +179,53 @@ export class Options extends LitElement {
 
   renderUserSettings() {
     return html`
-      <h2>User Settings</h2>
+      <h2>${chrome.i18n.getMessage('user_settings')}</h2>
       <form id="UserSettings" @submit="${this._onUserSettings}">
         <div class="form-group">
           <h3>OpenAI API Token</h3>
           <input type="text" id="apiToken" placeholder="sk-" value="${this.apiToken}" />
           ${!this.apiToken
-            ? html`<p class="warning">
-                API token is required for this extension. Please enter it above.
-              </p>`
+            ? html`<p class="warning">${chrome.i18n.getMessage('api_token_is_required')}</p>`
             : null}
           <p>
-            If you don't have an API token, you can generate one
-            <a href="https://platform.openai.com/account/api-keys" target="_blank">here</a>.
+            ${chrome.i18n.getMessage('if_you_dont_have_api_token')}
+            <a href="https://platform.openai.com/account/api-keys" target="_blank"
+              >${chrome.i18n.getMessage('here')}</a
+            >.
           </p>
-          <h3>Your Avatar Url</h3>
+          <h3>${chrome.i18n.getMessage('your_avatar_url')}</h3>
           <input type="text" id="avatarUrl" value="${this.avatarUrl}" />
           <p>
-            Want to display your Google Account image? Please use
+            ${chrome.i18n.getMessage('want_to_display')}
             <a
               href="https://google-account-photo.vercel.app/api/?account_id=YOUR_ACCOUNT_ID"
               target="_blank"
               >https://google-account-photo.vercel.app/api/?account_id=YOUR_ACCOUNT_ID</a
-            >. The <code>YOUR_ACCOUNT_ID</code> can be found by accessing
+            >. ${chrome.i18n.getMessage('the_your_account_id')}
             <a
               href="https://developers.google.com/people/api/rest/v1/people/get?hl=ja&apix_params=%7B%22resourceName%22%3A%22people%2Fme%22%2C%22personFields%22%3A%22photos%22%7D"
               target="_blank"
-              >here</a
+              >${chrome.i18n.getMessage('here')}</a
             >
-            and executing the API. The response will contain "people/YOUR_ACCOUNT_ID", and you can
-            use that as your <code>YOUR_ACCOUNT_ID</code>. For more details, please visit
+            ${chrome.i18n.getMessage('and_executing_the_api')}
             <a href="https://github.com/silverbirder/Google-Account-Photo-API" target="_blank"
               >https://github.com/silverbirder/Google-Account-Photo-API</a
             >.
           </p>
         </div>
-        <input type="submit" value="Save" class="submit-button" />
+        <input type="submit" value="${chrome.i18n.getMessage('save')}" class="submit-button" />
       </form>
     `
   }
 
   renderShortcuts() {
     return html`
-      <h2>Shortcuts</h2>
+      <h2>${chrome.i18n.getMessage('shortcuts')}</h2>
       <form>
         <div class="form-group">
-          <p>
-            To view or change the shortcuts for this extension, please navigate to the following
-            URL:
-          </p>
+          <p>${chrome.i18n.getMessage('shortcut_view_or_change')}</p>
           <code>chrome://extensions/shortcuts</code>
-          <p>There is a defined shortcut for opening the side panel. It's very convenient!</p>
+          <p>${chrome.i18n.getMessage('shortcut_very_convenient')}</p>
         </div>
       </form>
     `
@@ -252,10 +251,10 @@ export class Options extends LitElement {
       margin: 0 auto;
       padding-top: 4rem;
       min-height: calc(100vh - 4rem - 52px);
-      max-width: 520px;
+      max-width: 650px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 650px) {
       .container {
         grid-template-columns: 1fr;
       }
@@ -330,9 +329,7 @@ export class Options extends LitElement {
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-left: 1em;
-    }
+      transition: background-color 0.3s ease;    }
 
     .submit-button:hover {
       background-color: #28a870;

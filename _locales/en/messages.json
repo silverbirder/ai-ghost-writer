@@ -1,0 +1,113 @@
+{
+  "appName": {
+    "message": "AI Ghostwriter"
+  },
+  "appDesc": {
+    "message": "AI Ghostwriter, a Chrome extension, provides real-time AI help for smoother, more effective writing."
+  },
+  "proofreading": {
+    "message": "Proofreading"
+  },
+  "generate_title": {
+    "message": "Generate title"
+  },
+  "generate_following_text": {
+    "message": "Generate following text"
+  },
+  "notification_api_token_required_title": {
+    "message": "API Token Required"
+  },
+  "notification_api_token_required_message": {
+    "message": "The OpenAI API token is not set. Please set it in the extension options."
+  },
+  "notification_communication_error_title": {
+    "message": "Communication Error"
+  },
+  "notification_communication_error_message": {
+    "message": "Please open the side panel and select AI Ghostwriter."
+  },
+  "openai_message_user_continue": {
+    "message": "Continue"
+  },
+  "alert_last_error": {
+    "message": "An error occurred while saving your settings."
+  },
+  "alert_success": {
+    "message": "Your settings have been saved successfully!"
+  },
+  "context_new_menu": {
+    "message": "New Menu"
+  },
+  "user_settings": {
+    "message": "User Settings"
+  },
+  "context_menu": {
+    "message": "Context Menu"
+  },
+  "shortcuts": {
+    "message": "Shortcuts"
+  },
+  "shortcut_view_or_change": {
+    "message": "To view or change the shortcuts for this extension, please navigate to the following URL"
+  },
+  "shortcut_very_convenient": {
+    "message": "There is a defined shortcut for opening the side panel. It's very convenient!"
+  },
+  "content_please_enter": {
+    "message": "Please enter the instruction for the action you wish to take (e.g., proofread) below. The text you enter will be passed to"
+  },
+  "content_in_the_messages": {
+    "message": "the 'content' in the 'messages' parameter of the OpenAI's ChatAPI"
+  },
+  "menu": {
+    "message": "Menu"
+  },
+  "delete_menu": {
+    "message": "Delete menu"
+  },
+  "add_menu": {
+    "message": "Add Menu"
+  },
+  "menu_name": {
+    "message": "Menu Name"
+  },
+  "content": {
+    "message": "Content"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "api_token_is_required": {
+    "message": "API token is required for this extension. Please enter it above."
+  },
+  "if_you_dont_have_api_token": {
+    "message": "If you don't have an API token, you can generate one"
+  },
+  "here": {
+    "message": "here"
+  },
+  "your_avatar_url": {
+    "message": "Your Avatar Url"
+  },
+  "want_to_display": {
+    "message": "Want to display your Google Account image? Please use"
+  },
+  "the_your_account_id": {
+    "message": "The YOUR_ACCOUNT_ID can be found by accessing"
+  },
+  "and_executing_the_api": {
+    "message": "and executing the API. The response will contain people/YOUR_ACCOUNT_ID, and you can use that as your YOUR_ACCOUNT_ID. For more details, please visit"
+  },
+  "comments_from_ai": {
+    "message": "Comments from AI ghost writer"
+  },
+  "stop": {
+    "message": "Stop"
+  },
+  "continue": {
+    "message": "Continue"
+  },
+  "please_select_the_text": {
+    "message": "Please select the text on the browser, open the context menu by right-clicking, and select 'AI Ghostwriter'."
+  }
+}
