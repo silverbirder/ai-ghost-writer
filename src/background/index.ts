@@ -2,25 +2,25 @@ console.info('chrome-ext template-lit-ts background script')
 import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai-edge'
 
 const DEFAULT_PROOFREADING =
-  'You are a professional ghostwriter.' +
-  'The data sent by the user is a blog manuscript.' +
-  'Clean up and output the manuscript.' +
-  'Output format is Markdown.' +
-  'Output language is Japanese.' +
+  'You are a professional ghostwriter.\n' +
+  'The data sent by the user is a blog manuscript.\n' +
+  'Clean up and output the manuscript.\n' +
+  'Output format is Markdown.\n' +
+  'Output language is Japanese.\n' +
   'Write the Output as concisely as possible.'
 
 const DEFAULT_GENERATE_TITLE =
-  'You are a professional ghostwriter.' +
-  'The data sent by the user is a blog content.' +
-  'Suggest five optimal titles from the blog content.' +
-  'Output language is Japanese.' +
+  'You are a professional ghostwriter.\n' +
+  'The data sent by the user is a blog content.\n' +
+  'Suggest five optimal titles from the blog content.\n' +
+  'Output language is Japanese.\n' +
   'Write the Output as concisely as possible.'
 
 const DEFAULT_GENERATE_FOLLOWING_TEXT =
-  'You are a professional ghostwriter.' +
-  'The data sent by the user is a blog content.' +
-  'Generate text that continues from this blog content.' +
-  'Output language is Japanese.' +
+  'You are a professional ghostwriter.\n' +
+  'The data sent by the user is a blog content.\n' +
+  'Generate text that continues from this blog content.\n' +
+  'Output language is Japanese.\n' +
   'Write the Output as concisely as possible.'
 
 const DEFAULT_AVATAR_URL = 'https://www.gravatar.com/avatar/?d=mp'
@@ -29,38 +29,41 @@ chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch((error) => console.error(error))
 
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
 chrome.runtime.onInstalled.addListener(async (detail) => {
   console.info('chrome.runtime.onInstalled')
-  chrome.contextMenus.create({
-    id: 'proofreading',
-    title: `Proofreading "%s"`,
-    contexts: ['selection', 'editable'],
-  })
-  chrome.contextMenus.create({
-    id: 'generate-title',
-    title: `Generate Title "%s"`,
-    contexts: ['selection', 'editable'],
-  })
-  chrome.contextMenus.create({
-    id: 'generate-following-text',
-    title: `Generate Following Text "%s"`,
-    contexts: ['selection', 'editable'],
-  })
-  const { proofreading } = await chrome.storage.sync.get('proofreading')
-  if (!proofreading) {
-    await chrome.storage.sync.set({ proofreading: DEFAULT_PROOFREADING })
-    console.log('set default proofreading')
+  let { contextMenus } = await chrome.storage.sync.get('contextMenus')
+  console.log(contextMenus)
+  if (!contextMenus || contextMenus.length === 0) {
+    const defaultContextMenus = [
+      { id: generateUUID(), name: 'Proofreading', content: DEFAULT_PROOFREADING },
+      { id: generateUUID(), name: 'Generate title', content: DEFAULT_GENERATE_TITLE },
+      {
+        id: generateUUID(),
+        name: 'Generate following text',
+        content: DEFAULT_GENERATE_FOLLOWING_TEXT,
+      },
+    ]
+    await chrome.storage.sync.set({
+      contextMenus: defaultContextMenus,
+    })
+    console.log('set default contextMenus')
+    contextMenus = defaultContextMenus
   }
-  const { generateTitle } = await chrome.storage.sync.get('generateTitle')
-  if (!generateTitle) {
-    await chrome.storage.sync.set({ generateTitle: DEFAULT_GENERATE_TITLE })
-    console.log('set default generateTitle')
-  }
-  const { generateFollowingText } = await chrome.storage.sync.get('generateFollowingText')
-  if (!generateFollowingText) {
-    await chrome.storage.sync.set({ generateFollowingText: DEFAULT_GENERATE_FOLLOWING_TEXT })
-    console.log('set default generateFollowingText')
-  }
+  contextMenus.forEach((contextMenu: { name: string; id: string }) => {
+    chrome.contextMenus.create({
+      id: contextMenu.id,
+      title: `${contextMenu.name} "%s"`,
+      contexts: ['selection', 'editable'],
+    })
+  })
   const { avatarUrl } = await chrome.storage.sync.get('avatarUrl')
   if (!avatarUrl) {
     await chrome.storage.sync.set({ avatarUrl: DEFAULT_AVATAR_URL })
@@ -119,69 +122,64 @@ const onContextMenusClick = async ({
   })
   const openai = new OpenAIApi(configuration)
   console.info('chrome.contextMenus.onClicked')
-  if (['proofreading', 'generate-title', 'generate-following-text'].includes(menuItemId)) {
-    controller = new AbortController()
-    const signal = controller.signal
-    console.info('chrome.contextMenus.onClicked menuItemId')
-    console.info(`chrome.runtime.sendMessage ${menuItemId}-start`)
-    if (!skipStart) {
+
+  controller = new AbortController()
+  const signal = controller.signal
+  console.info('chrome.contextMenus.onClicked menuItemId')
+  console.info(`chrome.runtime.sendMessage start`)
+  const { contextMenus } = await chrome.storage.sync.get('contextMenus')
+  const contextMenu = contextMenus.find(
+    (contextMenu: { id: string }) => contextMenu.id === menuItemId,
+  )
+  console.log({ contextMenus, contextMenu, menuItemId })
+  if (!skipStart) {
+    chrome.runtime.sendMessage({
+      name: `start`,
+      id: contextMenu.id,
+      selectionText: selectionText,
+      contextMenuName: contextMenu.name,
+    })
+  }
+  console.info('before openai api call')
+  const myMessages: ChatCompletionRequestMessage[] = [
+    {
+      role: 'system',
+      content: contextMenu.content,
+    },
+    { role: 'user', content: selectionText },
+    ...messages,
+  ]
+  console.log('messages')
+  console.log(myMessages)
+  const completion = await openai.createChatCompletion(
+    {
+      model: 'gpt-4',
+      messages: myMessages,
+      temperature: 0,
+      stream: true,
+      max_tokens: 256,
+    },
+    {
+      signal,
+    },
+  )
+  console.info('after openai api call')
+  if (!completion.body) return
+  if (completion.status !== 200) {
+    throw new Error('Request failed')
+  }
+  const reader: ReadableStreamReader<Uint8Array> = completion.body?.getReader()
+  const decoder: TextDecoder = new TextDecoder('utf-8')
+  processStream(reader, decoder, selectionText || '', contextMenu.id).catch((err: any) => {
+    console.error(err)
+    if (signal.aborted) {
+      console.log('signal.aborted.inner')
       chrome.runtime.sendMessage({
-        name: `${menuItemId}-start`,
+        name: `end`,
         selectionText: selectionText,
       })
     }
-    console.info('before openai api call')
-    let content = ''
-    if (menuItemId === 'proofreading') {
-      const { proofreading } = await chrome.storage.sync.get('proofreading')
-      content = proofreading
-    } else if (menuItemId === 'generate-title') {
-      const { generateTitle } = await chrome.storage.sync.get('generateTitle')
-      content = generateTitle
-    } else if (menuItemId === 'generate-following-text') {
-      const { generateFollowingText } = await chrome.storage.sync.get('generateFollowingText')
-      content = generateFollowingText
-    }
-    const myMessages: ChatCompletionRequestMessage[] = [
-      {
-        role: 'system',
-        content: content,
-      },
-      { role: 'user', content: selectionText },
-      ...messages,
-    ]
-    console.log('messages')
-    console.log(myMessages)
-    const completion = await openai.createChatCompletion(
-      {
-        model: 'gpt-4',
-        messages: myMessages,
-        temperature: 0,
-        stream: true,
-        max_tokens: 256,
-      },
-      {
-        signal,
-      },
-    )
-    console.info('after openai api call')
-    if (!completion.body) return
-    if (completion.status !== 200) {
-      throw new Error('Request failed')
-    }
-    const reader: ReadableStreamReader<Uint8Array> = completion.body?.getReader()
-    const decoder: TextDecoder = new TextDecoder('utf-8')
-    processStream(reader, decoder, selectionText || '', menuItemId).catch((err: any) => {
-      console.error(err)
-      if (signal.aborted) {
-        console.log('signal.aborted.inner')
-        chrome.runtime.sendMessage({
-          name: `${menuItemId}-end`,
-          selectionText: selectionText,
-        })
-      }
-    })
-  }
+  })
 }
 
 async function processStream(
@@ -208,16 +206,18 @@ async function processStream(
           console.log('api json is', { json })
           const finish_reason = json.choices[0].finish_reason
           if (finish_reason === 'stop' || finish_reason === 'length') {
-            console.info(`chrome.runtime.sendMessage ${menuItemId}-end`)
+            console.info(`chrome.runtime.sendMessage end`)
             chrome.runtime.sendMessage({
-              name: `${menuItemId}-end`,
+              name: `end`,
+              id: menuItemId,
               selectionText,
               finishReason: finish_reason,
             })
           } else {
-            console.info(`chrome.runtime.sendMessage ${menuItemId}-inprogress`)
+            console.info(`chrome.runtime.sendMessage inprogress`)
             chrome.runtime.sendMessage({
-              name: `${menuItemId}-inprogress`,
+              name: `inprogress`,
+              id: menuItemId,
               data: json.choices[0].delta.content,
               selectionText,
             })
@@ -238,7 +238,7 @@ chrome.runtime.onMessage.addListener((request) => {
     const chat = request.chat
     console.log(chat)
     onContextMenusClick({
-      menuItemId: chat.name,
+      menuItemId: chat.id,
       selectionText: chat.selectionText,
       messages: [
         { role: 'assistant', content: chat.comments.join('') },

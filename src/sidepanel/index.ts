@@ -12,6 +12,7 @@ export class Sidepanel extends LitElement {
   @state()
   chats: {
     name: string
+    id: string
     type: string
     selectionText: string
     comments: string[]
@@ -20,12 +21,16 @@ export class Sidepanel extends LitElement {
 
   _onMessage = ({
     name,
+    id,
     data,
+    contextMenuName,
     selectionText,
     finishReason,
   }: {
     name: string
+    id: string
     data: any
+    contextMenuName: string
     selectionText: string
     finishReason: string
   }) => {
@@ -33,10 +38,11 @@ export class Sidepanel extends LitElement {
       case 'smoke':
         console.log('smoke ok!')
         return
-      case 'proofreading-start':
+      case 'start':
         this.chats.push({
-          name: 'proofreading',
-          type: 'Proofreading',
+          name: name,
+          id: id,
+          type: contextMenuName,
           selectionText,
           comments: [],
           enabled: {
@@ -44,44 +50,14 @@ export class Sidepanel extends LitElement {
             continue: false,
           },
         })
-        console.log('proofreading-start')
+        console.log('start')
         break
-      case 'generate-title-start':
-        this.chats.push({
-          name: 'generate-title',
-          type: 'Generate title',
-          selectionText,
-          comments: [],
-          enabled: {
-            stop: true,
-            continue: false,
-          },
-        })
-        console.log('generate-title-start')
-        break
-      case 'generate-following-text-start':
-        this.chats.push({
-          name: 'generate-following-text',
-          type: 'Generate following text',
-          selectionText,
-          comments: [],
-          enabled: {
-            stop: true,
-            continue: false,
-          },
-        })
-        console.log('generate-next-text-start')
-        break
-      case 'proofreading-inprogress':
-      case 'generate-title-inprogress':
-      case 'generate-following-text-inprogress':
+      case 'inprogress':
         console.info(data)
         this.chats[this.chats.length - 1].comments.push(data)
         this.chats[this.chats.length - 1].enabled.stop = true
         break
-      case 'proofreading-end':
-      case 'generate-title-end':
-      case 'generate-following-text-end':
+      case 'end':
         console.info(this.chats[this.chats.length - 1].comments)
         this.chats[this.chats.length - 1].enabled.stop = false
         this.chats[this.chats.length - 1].enabled.continue =
@@ -125,6 +101,7 @@ export class Sidepanel extends LitElement {
 
   private async _onContinueClick() {
     const chat = this.chats[this.chats.length - 1]
+    console.log({chat});
     await chrome.runtime.sendMessage({ continue: true, chat: chat })
     this.chats[this.chats.length - 1].enabled.continue = false
     chrome.storage.sync.set({ chats: this.chats })
@@ -172,7 +149,7 @@ export class Sidepanel extends LitElement {
             </div>`
           : html`<p>
               Please select the text on the browser, open the context menu by right-clicking, and
-              select 'Proofreading'.
+              select 'AI Ghostwriter'.
             </p>`}
       </main>
     `

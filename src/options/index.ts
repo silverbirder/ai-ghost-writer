@@ -10,13 +10,7 @@ export class Options extends LitElement {
   apiToken = ''
 
   @state()
-  proofreading = ''
-
-  @state()
-  generateTitle = ''
-
-  @state()
-  generateFollowingText = ''
+  contextMenus: { id: string; name: string; content: string }[] = []
 
   @state()
   activeMenu = 'userSettings'
@@ -39,31 +33,52 @@ export class Options extends LitElement {
 
   private _onContextMenu(event: Event) {
     event.preventDefault()
-    const proofreading = (this.shadowRoot!.getElementById('proofreading') as HTMLInputElement).value
-    const generateTitle = (this.shadowRoot!.getElementById('generateTitle') as HTMLInputElement)
-      .value
-    const generateFollowingText = (
-      this.shadowRoot!.getElementById('generateFollowingText') as HTMLInputElement
-    ).value
-    chrome.storage.sync.set({ proofreading, generateTitle, generateFollowingText }, () => {
+    this.contextMenus.forEach((menu, index) => {
+      menu.name = (this.shadowRoot!.getElementById(`name${index}`) as HTMLInputElement).value
+      menu.content = (this.shadowRoot!.getElementById(`content${index}`) as HTMLInputElement).value
+    })
+    chrome.storage.sync.set({ contextMenus: this.contextMenus }, () => {
       if (chrome.runtime.lastError) {
         alert('An error occurred while saving your settings.')
       } else {
         alert('Your settings have been saved successfully!')
+        chrome.contextMenus.removeAll()
+        this.contextMenus.forEach((contextMenu) => {
+          chrome.contextMenus.create({
+            id: contextMenu.id,
+            title: `${contextMenu.name} "%s"`,
+            contexts: ['selection', 'editable'],
+          })
+        })
       }
     })
+  }
+
+  generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = (Math.random() * 16) | 0,
+        v = c === 'x' ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    })
+  }
+
+  addMenu() {
+    this.contextMenus.push({ id: this.generateUUID(), name: 'New Menu', content: '' })
+    this.requestUpdate()
+  }
+
+  deleteMenu(id: string) {
+    this.contextMenus = this.contextMenus.filter((menu) => menu.id !== id)
   }
 
   connectedCallback() {
     super.connectedCallback()
     chrome.storage.sync
-      .get(['apiToken', 'proofreading', 'generateTitle', 'generateFollowingText', 'avatarUrl'])
-      .then(({ apiToken, proofreading, generateTitle, generateFollowingText, avatarUrl }) => {
-        console.log({ apiToken, proofreading })
+      .get(['apiToken', 'contextMenus', 'avatarUrl'])
+      .then(({ apiToken, contextMenus, avatarUrl }) => {
+        console.log({ apiToken, contextMenus })
         this.apiToken = apiToken
-        this.proofreading = proofreading
-        this.generateTitle = generateTitle
-        this.generateFollowingText = generateFollowingText
+        this.contextMenus = contextMenus
         this.avatarUrl = avatarUrl
       })
   }
@@ -124,15 +139,37 @@ export class Options extends LitElement {
         >.
       </p>
       <form id="contextMenu" @submit="${this._onContextMenu}">
-        <div class="form-group">
-          <h3>Proofreading</h3>
-          <textarea id="proofreading" rows="10">${this.proofreading}</textarea>
-          <h3>Generate title</h3>
-          <textarea id="generateTitle" rows="10">${this.generateTitle}</textarea>
-          <h3>Generate following text</h3>
-          <textarea id="generateFollowingText" rows="10">${this.generateFollowingText}</textarea>
+        ${this.contextMenus.map(
+          (menu, index) => html`
+            <div class="form-group">
+              <div class="menu-header">
+                <h3>Menu No.${index + 1}</h3>
+                <button
+                  type="button"
+                  class="delete-menu-button"
+                  @click="${() => this.deleteMenu(menu.id)}"
+                >
+                  &#10006; Delete menu
+                </button>
+              </div>
+              <label for="name${index}">Menu Name</label>
+              <input type="text" id="name${index}" value="${menu.name}" />
+              <label for="content${index}">Content</label>
+              <textarea id="content${index}" rows="10">${menu.content}</textarea>
+            </div>
+          `,
+        )}
+        <div class="button-group">
+          <button type="button" class="add-menu-button" @click="${this.addMenu}">
+            <span class="plus-icon">&#43;</span> Add Menu
+          </button>
+          <input
+            type="submit"
+            value="Save"
+            class="submit-button"
+            ?disabled="${this.contextMenus.length === 0}"
+          />
         </div>
-        <input type="submit" value="Save" class="submit-button" />
       </form>
     `
   }
@@ -260,6 +297,7 @@ export class Options extends LitElement {
       flex-direction: column;
       align-items: start;
       margin-bottom: 1em;
+      position: relative;
     }
 
     .form-group label {
@@ -270,14 +308,19 @@ export class Options extends LitElement {
       padding: 0.5em;
       border: 1px solid #ccc;
       border-radius: 4px;
-      width: 100%;
+      width: 93%;
     }
 
     .form-group textarea {
       padding: 0.5em;
       border: 1px solid #ccc;
       border-radius: 4px;
-      width: 100%;
+      width: 93%;
+    }
+
+    input[type='submit']:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
     }
 
     .submit-button {
@@ -288,10 +331,58 @@ export class Options extends LitElement {
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      margin-left: 1em;
     }
 
     .submit-button:hover {
       background-color: #28a870;
+    }
+
+    .add-menu-button {
+      padding: 0.5em 1em;
+      color: #fff;
+      background-color: #31c48d;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .plus-icon {
+      margin-right: 0.5em;
+    }
+
+    .add-menu-button:hover {
+      background-color: #28a870;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      width: 98%;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .delete-menu-button {
+      border: none;
+      color: #ffffff;
+      background-color: #dc3545;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      position: absolute;
+      right: 10px;
+    }
+
+    .delete-menu-button:hover {
+      background-color: #c82333;
     }
 
     .warning {
