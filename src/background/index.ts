@@ -173,7 +173,6 @@ const onContextMenusClick = async ({
   processStream(reader, decoder, selectionText || '', contextMenu.id).catch((err: any) => {
     console.error(err)
     if (signal.aborted) {
-      console.log('signal.aborted.inner')
       chrome.runtime.sendMessage({
         name: `end`,
         selectionText: selectionText,
