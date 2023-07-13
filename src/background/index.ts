@@ -165,7 +165,7 @@ const onContextMenusClick = async ({
       messages: myMessages,
       temperature: 0,
       stream: true,
-      max_tokens: 12,
+      max_tokens: 256,
     },
     {
       signal,
