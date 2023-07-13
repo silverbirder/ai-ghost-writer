@@ -150,6 +150,9 @@ export class Sidepanel extends LitElement {
               })}
             </div>`
           : html`<p>${chrome.i18n.getMessage('please_select_the_text')}</p>`}
+        <a href="https://l23dbx7ptb9.typeform.com/to/ET7w2p20" target="_blank" class="feedback-link"
+          >Share feedback</a
+        >
       </main>
     `
   }
@@ -266,6 +269,13 @@ export class Sidepanel extends LitElement {
       padding: 5px;
       border-radius: 5px;
       position: relative;
+    }
+
+    .feedback-link {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      color: #0099ff;
     }
   `
 }
