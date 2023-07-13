@@ -150,7 +150,12 @@ export class Sidepanel extends LitElement {
               })}
             </div>`
           : html`<p>${chrome.i18n.getMessage('please_select_the_text')}</p>`}
-        <a href="https://l23dbx7ptb9.typeform.com/to/ET7w2p20" target="_blank" class="feedback-link"
+        <a
+          href="${chrome.i18n.getUILanguage() === 'ja'
+            ? 'https://l23dbx7ptb9.typeform.com/to/cc6ghtd2'
+            : 'https://l23dbx7ptb9.typeform.com/to/ET7w2p20'}"
+          target="_blank"
+          class="feedback-link"
           >Share feedback</a
         >
       </main>
@@ -162,9 +167,18 @@ export class Sidepanel extends LitElement {
       min-width: 20rem;
     }
 
+    :host {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     main {
+      position: relative;
       padding: 1em;
       margin: 0 auto;
+      overflow-y: auto;
+      flex-grow: 1;
     }
 
     h3 {
@@ -272,10 +286,12 @@ export class Sidepanel extends LitElement {
     }
 
     .feedback-link {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
+      position: sticky;
+      bottom: 0;
       color: #0099ff;
+      text-decoration: none;
+      background-color: inherit;
+      text-align: center;
     }
   `
 }
